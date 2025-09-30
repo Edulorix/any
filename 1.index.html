@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="x-apple-disable-message-reformatting" />
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no,url=no" />
+<title>TSC Learner-Facing Templates (Demo)</title>
+<style>
+:root{
+  --ink:#0f172a; --muted:#64748b; --line:#e5e7eb; --head:#f3f4f6; --bg:#ffffff;
+  --primary:#2563eb; --chip:#eef2ff;
+}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Malgun Gothic","맑은 고딕",Segoe UI,Arial,sans-serif;}
+.wrap{max-width:1100px;margin:36px auto;padding:0 20px}
+h1{margin:0 0 14px;font-size:24px;letter-spacing:.2px}
+.sub{margin:0 0 18px;color:var(--muted);font-size:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.05)}
+.card .hd{padding:14px 16px;background:var(--head);font-weight:800;border-bottom:1px solid var(--line)}
+.card .bd{padding:16px}
+
+/* Tabs (no JS) */
+.tab{display:none} .tab.default{display:block}
+.tab-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.tab-nav a{padding:10px 12px;border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);background:#fff;font-weight:600}
+.tab-nav a:hover{background:var(--head)}
+#t1:target ~ .tab-nav a[href="#t1"],
+#t2:target ~ .tab-nav a[href="#t2"],
+#t3:target ~ .tab-nav a[href="#t3"],
+#t4:target ~ .tab-nav a[href="#t4"],
+#t5:target ~ .tab-nav a[href="#t5"],
+#t6:target ~ .tab-nav a[href="#t6"],
+#t7:target ~ .tab-nav a[href="#t7"]{background:var(--chip);border-color:#c7d2fe}
+#t1:target, #t2:target, #t3:target, #t4:target, #t5:target, #t6:target, #t7:target{display:block}
+
+/* Outlook-safe email box (table layout) */
+.mail{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.mail .title{background:#111827;color:#fff;padding:14px 16px;font-weight:800}
+.mail .bd{padding:0}
+.mail table{border-collapse:collapse;width:100%;table-layout:fixed}
+.mail td{border-top:1px solid #eee;padding:14px 16px;vertical-align:top;font-size:14px;word-break:keep-all}
+.mail .foot{color:#64748b}
+
+/* Print sheets */
+.sheet{width:210mm;min-height:297mm;margin:0 auto;background:#fff}
+.sheet .ph{padding:18px 20px;background:#f8fafc;border-bottom:1px solid var(--line)}
+.sheet .pb{padding:20px}
+.kv{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.kv .chip{padding:6px 10px;border:1px dashed #c7d2fe;background:var(--chip);border-radius:10px;font-size:12px;color:#3730a3}
+
+/* QR tiles */
+.qr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.qr{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px}
+.qr img{width:92px;height:92px;border:1px solid var(--line);border-radius:8px;object-fit:cover;background:#fff}
+.qr .meta b{font-size:16px}
+
+/* FAQ */
+.faq{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.faq details{border-top:1px solid var(--line);background:#fff}
+.faq details:first-of-type{border-top:none}
+.faq summary{cursor:pointer;padding:14px 16px;font-weight:700}
+.faq .ans{padding:0 16px 16px 16px;color:var(--ink)}
+.notice{padding:12px 14px;background:#fff8e1;border:1px solid #facc15;border-radius:12px}
+
+/* Poster */
+.poster{border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.poster .hero{padding:30px 26px;background:linear-gradient(135deg,#111827,#1f2937);color:#fff}
+.poster .hero .title{font-size:28px;font-weight:900;letter-spacing:.2px}
+.poster .hero .sub{color:#cbd5e1}
+.poster .body{padding:18px 20px}
+.poster .row{display:flex;gap:18px;align-items:center}
+.poster .qrbox{margin-left:auto;border:1px dashed #94a3b8;border-radius:10px;padding:10px;text-align:center}
+.poster .qrbox img{width:120px;height:120px;border:1px solid #334155;border-radius:6px;background:#fff}
+
+/* Map block */
+.mapwrap{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.maprow{display:flex;gap:16px}
+.map{flex:1;min-height:240px;background:#f1f5f9;border-right:1px solid var(--line)}
+.mapnote{flex:1;padding:14px}
+
+/* Print */
+@page{size:A4;margin:0}
+@media print{
+  body{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .wrap{max-width:none;margin:0;padding:0}
+  .noprint{display:none !important}
+  .sheet{box-shadow:none !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>교육생 안내용 템플릿 모음 (Demo)</h1>
+  <p class="sub">모든 콘텐츠는 {{중괄호토큰}} 치환 후 사용. 메일은 박스 전체 복사→Outlook 본문 붙여넣기, 인쇄물은 Ctrl/Cmd+P로 A4 출력.</p>
+
+  <!-- anchors to drive :target -->
+  <div id="t1" class="tab default"></div>
+  <div id="t2" class="tab"></div>
+  <div id="t3" class="tab"></div>
+  <div id="t4" class="tab"></div>
+  <div id="t5" class="tab"></div>
+  <div id="t6" class="tab"></div>
+  <div id="t7" class="tab"></div>
+
+  <div class="tab-nav noprint">
+    <a href="#t1">① 안내 메일 (KR/EN)</a>
+    <a href="#t2">② D-1 리마인드 메일</a>
+    
+    <a href="#t4">③ FAQ (자주 묻는 질문)</a>
+    <a href="#t5">④ 만족도 설문 메일</a>
+    <a href="#t6">⑤ A4 포스터(시간·장소·QR)</a>
+    <a href="#t7">⑥ 오시는 길 블록</a>
+  </div>
+
+  <!-- ① 안내 메일 (이중언어) -->
+  <div class="card">
+    <div class="hd">① Course Announcement Email (KR/EN)</div>
+    <div class="bd">
+      <div class="kv noprint">
+        <span class="chip">{{COURSE}}</span><span class="chip">{{DATES}}</span><span class="chip">{{VENUE}}</span>
+        <span class="chip">{{CONTACT_NAME}} / {{CONTACT_EMAIL}} / {{CONTACT_PHONE}}</span>
+      </div>
+      <div class="mail">
+        <div class="title">[안내] {{PROGRAM_TAG}} {{COURSE}} ({{DATES}} / {{VENUE}})</div>
+        <div class="bd">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <tr><td>
+              안녕하세요, {{ORG_NAME}} 교육운영팀 {{SENDER_NAME}}입니다.<br><br>
+              <b>{{COURSE}}</b> 과정의 참여 안내를 드립니다. 원활한 진행을 위해 <b>사전 준비사항</b>을 확인해주세요.
+            </td></tr>
+            <tr><td>
+              <b>① 일정/장소</b><br>
+              • 일시: {{DATES}}<br>
+              • 장소: {{VENUE}} ({{ROOM}})<br>
+              • 대상: {{AUDIENCE}}
+            </td></tr>
+            <tr><td>
+              <b>② 사전 준비</b><br>
+              • 노트북: {{LAPTOP_REQ}}<br>
+              • 네트워크/권한: {{ACCESS_REQ}}<br>
+              • 사전과제: {{PREWORK_LINK}}<br>
+              • 현장 등록: 신분증 및 사원증 지참
+            </td></tr>
+            <tr><td>
+              <b>③ 출결/이수</b><br>
+              • 출석: 입실 시 체크인 필수 (지각/조퇴 시 {{CONTACT_NAME}}에게 공유)<br>
+              • 이수기준: {{CRITERIA}}<br>
+              • 설문링크: {{SURVEY_LINK}} ({{SURVEY_DEADLINE}} 마감)
+            </td></tr>
+            <tr><td class="foot">
+              문의: {{CONTACT_NAME}} ({{CONTACT_EMAIL}} / {{CONTACT_PHONE}})<br>
+              감사합니다.
+            </td></tr>
+          </table>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div class="mail">
+        <div class="title">[Notice] {{PROGRAM_TAG}} {{COURSE}} ({{DATES}} / {{VENUE}})</div>
+        <div class="bd">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <tr><td>
+              Hello, this is {{SENDER_NAME}} from {{ORG_NAME}} Training Operations.<br><br>
+              Please find details for <b>{{COURSE}}</b> below and check the <b>pre-work</b> in advance.
+            </td></tr>
+            <tr><td>
+              <b>① Schedule / Venue</b><br>
+              • Date/Time: {{DATES}}<br>
+              • Venue: {{VENUE}} ({{ROOM}})<br>
+              • Audience: {{AUDIENCE}}
+            </td></tr>
+            <tr><td>
+              <b>② Preparation</b><br>
+              • Laptop: {{LAPTOP_REQ}}<br>
+              • Network/Access: {{ACCESS_REQ}}<br>
+              • Pre-work: {{PREWORK_LINK}}<br>
+              • Check-in: Bring your ID/employee card
+            </td></tr>
+            <tr><td>
+              <b>③ Attendance & Completion</b><br>
+              • Attendance: On-site check-in is required (notify {{CONTACT_NAME}} if late/early leave)<br>
+              • Completion: {{CRITERIA}}<br>
+              • Survey: {{SURVEY_LINK}} (due {{SURVEY_DEADLINE}})
+            </td></tr>
+            <tr><td class="foot">
+              Inquiries: {{CONTACT_NAME}} ({{CONTACT_EMAIL}} / {{CONTACT_PHONE}})<br>
+              Thank you.
+            </td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <!-- ② D-1 리마인드 메일 -->
+  <div class="card">
+    <div class="hd">② D-1 Reminder Email</div>
+    <div class="bd">
+      <div class="mail">
+        <div class="title">[리마인드] 내일 {{COURSE}} 참석 전 체크리스트</div>
+        <div class="bd">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <tr><td>
+              안녕하세요, 내일 <b>{{COURSE}}</b> 참석을 앞두고 필수 체크사항을 공유드립니다.
+            </td></tr>
+            <tr><td>
+              <b>체크리스트</b><br>
+              □ 노트북/전원 어댑터 □ 사내 VPN/권한 점검 □ 예제 파일 사전 다운로드<br>
+              □ 신분증/사원증 □ 설문 링크 북마크 ({{SURVEY_LINK}})
+            </td></tr>
+            <tr><td>
+              <b>입실 안내</b><br>
+              • 등록 오픈: {{DOOR_OPEN_TIME}} / 시작: {{START_TIME}} (정시)<br>
+              • 장소: {{VENUE}} {{ROOM}} (층: {{FLOOR}})<br>
+              • 주차/출입: {{ENTRY_NOTE}}
+            </td></tr>
+            <tr><td class="foot">
+              당일 문의: {{CONTACT_NAME}} ({{CONTACT_PHONE}}) · 메일 {{CONTACT_EMAIL}}
+            </td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <!-- ④ FAQ -->
+  <div class="card">
+    <div class="hd">③ FAQ (자주 묻는 질문, Outlook 호환 문안 포함)</div>
+    <div class="bd">
+      <div class="notice noprint">웹/문서에서는 접이식(아래). Outlook에는 아래 “복사용 텍스트 블록”을 붙여넣으세요.</div>
+      <div class="faq">
+        <details open>
+          <summary>노트북 필수인가요?</summary>
+          <div class="ans">네. 실습이 포함되어 <b>{{LAPTOP_REQ}}</b> 노트북이 필요합니다.</div>
+        </details>
+        <details>
+          <summary>사내망/VPN이 필요한가요?</summary>
+          <div class="ans">예. <b>{{ACCESS_REQ}}</b> 준비가 필요합니다. VPN 설치가 막히면 {{HELP_DESK}}에 문의하세요.</div>
+        </details>
+        <details>
+          <summary>지각하면 이수에 영향이 있나요?</summary>
+          <div class="ans">이수 기준은 <b>{{CRITERIA}}</b>이며 지각/조퇴 시 <b>{{CONTACT_NAME}}</b>에게 공유해주세요.</div>
+        </details>
+        <details>
+          <summary>교재와 예제 파일은 어디서 받나요?</summary>
+          <div class="ans">{{MATERIALS_URL}} 에서 내려받을 수 있습니다.</div>
+        </details>
+      </div>
+
+      <div style="height:10px"></div>
+      <div class="mail">
+        <div class="title">[복사용] FAQ 텍스트 블록 (Outlook 본문용)</div>
+        <div class="bd">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <tr><td><b>Q1. 노트북 필수인가요?</b><br>→ {{LAPTOP_REQ}}</td></tr>
+            <tr><td><b>Q2. 사내망/VPN 필요?</b><br>→ {{ACCESS_REQ}} (문제 시 {{HELP_DESK}})</td></tr>
+            <tr><td><b>Q3. 지각 시 이수?</b><br>→ {{CRITERIA}} (지각/조퇴 시 {{CONTACT_NAME}} 공유)</td></tr>
+            <tr><td><b>Q4. 교재/예제 위치?</b><br>→ {{MATERIALS_URL}}</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <!-- ⑤ 만족도 설문 메일 -->
+  <div class="card">
+    <div class="hd">⑤ Post-Event Survey Email</div>
+    <div class="bd">
+      <div class="mail">
+        <div class="title">[설문 요청] {{COURSE}} 참여 소감 부탁드립니다 ({{SURVEY_DEADLINE}} 마감)</div>
+        <div class="bd">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+            <tr><td>
+              안녕하세요, {{SENDER_NAME}}입니다.<br><br>
+              <b>{{COURSE}}</b>에 참여해 주셔서 감사합니다. 다음 운영 개선을 위해 소중한 의견을 들려주세요.
+            </td></tr>
+            <tr><td>
+              <b>설문</b><br>
+              • 링크: {{SURVEY_LINK}}<br>
+              • 마감: {{SURVEY_DEADLINE}} (소요: 약 {{SURVEY_MINS}}분)
+            </td></tr>
+            <tr><td>
+              <b>이수 처리</b><br>
+              • 설문 완료 후 {{CERT_NOTE}}<br>
+              • 이수/수료증 관련 문의: {{CONTACT_NAME}} ({{CONTACT_EMAIL}})
+            </td></tr>
+            <tr><td class="foot">감사합니다.</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br/>
+
+  <!-- ⑦ 오시는 길 블록 -->
+  <div class="card">
+    <div class="hd">⑦ 오시는 길 (메일/안내문 삽입용 블록)</div>
+    <div class="bd">
+      <div class="mapwrap">
+        <div class="maprow">
+          <div class="map"><!-- 사내 맵 이미지 스냅샷을 배경으로 사용해도 됨 --></div>
+          <div class="mapnote">
+            <b>오시는 길</b><br>
+            • 주소: {{ADDR}} ({{VENUE}} {{ROOM}})<br>
+            • 지하철: {{SUBWAY_LINE}} {{SUBWAY_STN}} {{EXIT_NO}}번 출구 도보 {{WALK_MIN}}분<br>
+            • 차량: {{PARK_NOTE}}<br>
+            • 출입/보안: {{ENTRY_NOTE}}<br><br>
+            <b>네비 링크</b><br>
+            • 네이버지도: {{NMAP_LINK}}<br>
+            • 카카오맵: {{KMAP_LINK}}<br>
+            <span style="color:var(--muted);font-size:12px">메일에서는 텍스트 링크로 유지, 인쇄물은 QR로 변환 권장.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="sub noprint" style="margin-top:18px">Tip) 이 파일을 템플릿으로 저장하고, 과정마다 {{COURSE}}, {{DATES}}, {{VENUE}} 등만 바꿔 재사용하세요.</p>
+</div>
+
+<!-- 사용법 요약
+1) 메일: .mail 박스를 통째로 복사→Outlook 본문에 붙여넣기 (표 기반이라 깨짐 최소화)
+2) A4 인쇄물: 브라우저에서 Ctrl/Cmd+P → A4(여백 0) 인쇄
+3) QR: 사내 생성기에서 PNG로 받은 뒤 {{QR_*_IMG}}에 경로 연결
+4) 맵: 캡처 이미지를 .map 배경으로 넣어도 OK (또는 텍스트 링크/QR 사용)
+-->
+</body>
+</html>
