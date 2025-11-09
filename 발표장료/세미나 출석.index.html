@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>세미나 출결</title>
+  <style>
+    :root {
+      --bg:#ffffff;
+      --ink:#0f172a;
+      --muted:#6b7280;
+      --accent:#a50034;
+      --accent-soft:rgba(165,0,52,0.06);
+      --ok:#16a34a;
+      --warn:#b91c1c;
+      --radius-lg:24px;
+      --radius:14px;
+      --shadow:0 18px 45px rgba(15,23,42,0.12);
+    }
+
+    * {
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+        "Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    }
+
+    body {
+      min-height:100vh;
+      background:var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      color:var(--ink);
+    }
+
+    .shell {
+      width:100%;
+      max-width:780px;
+    }
+
+    .card {
+      background:#ffffff;
+      border-radius:var(--radius-lg);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(148,163,184,0.25);
+      padding:26px 24px 22px;
+    }
+
+    .header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .title-wrap {
+      cursor:pointer; /* 제목 3번 클릭 → 운영자 설정(화면엔 안 보임) */
+    }
+
+    .eyebrow {
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    h1 {
+      font-size:22px;
+      font-weight:700;
+      line-height:1.25;
+    }
+
+    .badge {
+      font-size:11px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:var(--accent);
+      color:#ffffff;
+      box-shadow:0 6px 15px rgba(165,0,52,0.3);
+      white-space:nowrap;
+    }
+
+    .subtitle {
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:18px;
+    }
+
+    form {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .field {
+      text-align:left;
+    }
+
+    .label-row {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      margin-bottom:4px;
+    }
+
+    label {
+      font-size:13px;
+      font-weight:500;
+    }
+
+    .hint {
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    input {
+      width:100%;
+      border-radius:var(--radius);
+      border:1px solid #e5e7eb;
+      padding:9px 11px;
+      font-size:14px;
+      background:#f9fafb;
+      transition:border-color .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+
+    input:focus {
+      outline:none;
+      border-color:var(--accent);
+      background:#ffffff;
+      box-shadow:0 0 0 1px rgba(165,0,52,0.25);
+    }
+
+    .pin-input {
+      letter-spacing:.32em;
+      text-align:center;
+      font-family:"SF Mono","JetBrains Mono",Consolas,monospace;
+    }
+
+    button {
+      border:none;
+      border-radius:999px;
+      padding:10px 16px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      background:var(--accent);
+      color:#ffffff;
+      margin-top:4px;
+      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
+      box-shadow:0 10px 25px rgba(165,0,52,0.28);
+    }
+
+    button:active {
+      transform:translateY(1px);
+      box-shadow:0 5px 12px rgba(165,0,52,0.35);
+    }
+
+    button[disabled] {
+      opacity:.65;
+      cursor:wait;
+      box-shadow:none;
+    }
+
+    .status {
+      font-size:12px;
+      margin-top:6px;
+      min-height:18px;
+    }
+
+    .status.ok {
+      color:var(--ok);
+    }
+
+    .status.err {
+      color:var(--warn);
+    }
+
+    .footer {
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px dashed #e5e7eb;
+      min-height:8px;
+      font-size:11px;
+      color:var(--muted);
+    }
+
+    /* 운영자 설정 모달 */
+    .admin-backdrop {
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,0.32);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:40;
+    }
+
+    .admin-card {
+      background:#ffffff;
+      border-radius:20px;
+      padding:20px 18px 16px;
+      width:100%;
+      max-width:380px;
+      box-shadow:0 20px 45px rgba(15,23,42,0.3);
+      border:1px solid rgba(148,163,184,0.5);
+    }
+
+    .admin-title {
+      font-size:15px;
+      font-weight:600;
+      margin-bottom:6px;
+    }
+
+    .admin-sub {
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
+
+    .admin-actions {
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .btn-secondary {
+      background:#f3f4f6;
+      color:#111827;
+      box-shadow:none;
+    }
+
+    .admin-check {
+      display:flex;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
+      font-size:13px;
+    }
+
+    .admin-check input {
+      width:auto;
+      padding:0;
+      box-shadow:none;
+    }
+
+    @media (max-width:600px) {
+      .card {padding:22px 18px 18px;}
+      h1 {font-size:20px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div class="header">
+        <div class="title-wrap" id="titleWrap">
+          <div class="eyebrow">SEMINAR ATTENDANCE</div>
+          <h1 id="pageTitle">세미나 출결</h1>
+        </div>
+        <div class="badge" id="courseBadge">과정명: 리스크 관리</div>
+      </div>
+
+      <p class="subtitle">
+        아래 정보를 입력 후 <strong>출석 체크</strong>를 눌러 주세요.<br>
+        PIN 번호가 일치하면 출석이 자동 기록됩니다.
+      </p>
+
+      <form id="attendanceForm">
+        <div class="field">
+          <div class="label-row"><label for="name">이름</label></div>
+          <input id="name" required placeholder="예) 김미진">
+        </div>
+        <div class="field">
+          <div class="label-row"><label for="empId">사번</label></div>
+          <input id="empId" required placeholder="예) 12345678">
+        </div>
+        <div class="field">
+          <div class="label-row">
+            <label for="pin">PIN 번호</label>
+            <span class="hint">운영자가 안내한 6자리</span>
+          </div>
+          <input id="pin" type="password" maxlength="6" class="pin-input" required placeholder="••••••">
+        </div>
+
+      <button type="submit" id="submitBtn">출석 체크</button>
+      <div class="status" id="statusMsg"></div>
+      </form>
+
+      <div class="footer"></div>
+    </div>
+  </div>
+
+  <!-- 운영자 설정 모달 -->
+  <div class="admin-backdrop" id="adminModal">
+    <div class="admin-card">
+      <div class="admin-title">운영자 설정</div>
+      <div class="admin-sub">
+        이 브라우저에서 사용할 과정명, PIN 번호, 표시 여부를 설정합니다.
+      </div>
+
+      <div class="field" style="margin-bottom:10px;">
+        <label for="adminCourseName">과정명</label>
+        <input id="adminCourseName" type="text" placeholder="예: 리스크 관리">
+      </div>
+
+      <div class="field" style="margin-bottom:6px;">
+        <label for="adminPin">PIN 번호 (6자리)</label>
+        <input id="adminPin" type="text" maxlength="6" class="pin-input" placeholder="예: 123456">
+      </div>
+
+      <div class="admin-check">
+        <input type="checkbox" id="adminShowCourse">
+        <label for="adminShowCourse">교육생 화면에 과정명 표시</label>
+      </div>
+
+      <div class="admin-actions">
+        <button type="button" class="btn-secondary" id="adminCancel">취소</button>
+        <button type="button" id="adminSave">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MS_ENDPOINT_URL = "https://example.com/your-ms-endpoint"; // Power Automate URL
+    const DEFAULT_PIN = "123456";
+    const DEFAULT_COURSE = "리스크 관리";
+
+    let currentPin = localStorage.getItem("seminarPin") || DEFAULT_PIN;
+    let courseName = localStorage.getItem("courseName") || DEFAULT_COURSE;
+    let showCourseName = (localStorage.getItem("showCourseName") !== "false"); // 기본 true
+
+    const courseBadge = document.getElementById("courseBadge");
+    const form = document.getElementById("attendanceForm");
+    const statusMsg = document.getElementById("statusMsg");
+    const submitBtn = document.getElementById("submitBtn");
+    const titleWrap = document.getElementById("titleWrap");
+
+    const adminModal = document.getElementById("adminModal");
+    const adminCourseNameInput = document.getElementById("adminCourseName");
+    const adminPinInput = document.getElementById("adminPin");
+    const adminShowCourseInput = document.getElementById("adminShowCourse");
+    const adminSaveBtn = document.getElementById("adminSave");
+    const adminCancelBtn = document.getElementById("adminCancel");
+
+    function renderCourseBadge() {
+      if (showCourseName) {
+        courseBadge.style.display = "inline-flex";
+        courseBadge.textContent = "과정명: " + courseName;
+      } else {
+        courseBadge.style.display = "none";
+      }
+    }
+    renderCourseBadge();
+
+    // 제목 3번 클릭 → 운영자 설정 열기 (화면에 안내는 안 함)
+    let clickCount = 0;
+    let clickTimer = null;
+
+    titleWrap.addEventListener("click", () => {
+      clickCount++;
+      if (clickCount === 1) {
+        clickTimer = setTimeout(() => { clickCount = 0; }, 700);
+      }
+      if (clickCount === 3) {
+        clearTimeout(clickTimer);
+        clickCount = 0;
+        openAdminModal();
+      }
+    });
+
+    function openAdminModal() {
+      adminCourseNameInput.value = courseName;
+      adminPinInput.value = currentPin;
+      adminShowCourseInput.checked = showCourseName;
+      adminModal.style.display = "flex";
+      adminCourseNameInput.focus();
+    }
+
+    function closeAdminModal() {
+      adminModal.style.display = "none";
+    }
+
+    adminCancelBtn.addEventListener("click", closeAdminModal);
+    adminModal.addEventListener("click", (e) => {
+      if (e.target === adminModal) closeAdminModal();
+    });
+
+    adminSaveBtn.addEventListener("click", () => {
+      const newCourse = adminCourseNameInput.value.trim() || DEFAULT_COURSE;
+      const newPin = adminPinInput.value.trim() || DEFAULT_PIN;
+      const newShow = adminShowCourseInput.checked;
+
+      if (!/^\d{4,6}$/.test(newPin)) {
+        alert("PIN 번호는 숫자 4~6자리로 설정해주세요.");
+        return;
+      }
+
+      courseName = newCourse;
+      currentPin = newPin;
+      showCourseName = newShow;
+
+      localStorage.setItem("courseName", courseName);
+      localStorage.setItem("seminarPin", currentPin);
+      localStorage.setItem("showCourseName", showCourseName);
+
+      renderCourseBadge();
+      closeAdminModal();
+      alert("설정이 저장되었습니다.");
+    });
+
+    // 출석 제출
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      statusMsg.textContent = "";
+      statusMsg.className = "status";
+
+      const name = document.getElementById("name").value.trim();
+      const empId = document.getElementById("empId").value.trim();
+      const pinVal = document.getElementById("pin").value.trim();
+
+      if (pinVal !== currentPin) {
+        statusMsg.textContent = "PIN 번호가 일치하지 않습니다.";
+        statusMsg.className = "status err";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "전송 중...";
+
+      const payload = {
+        name,
+        employeeId: empId,
+        pin: pinVal,
+        courseName,
+        showCourseName,
+        timestamp: new Date().toISOString(),
+      };
+
+      try {
+        const res = await fetch(MS_ENDPOINT_URL, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("응답 코드: " + res.status);
+
+        statusMsg.textContent = "출석이 정상적으로 기록되었습니다!";
+        statusMsg.className = "status ok";
+        form.reset();
+      } catch (err) {
+        console.error(err);
+        statusMsg.textContent = "전송 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+        statusMsg.className = "status err";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "출석 체크";
+      }
+    });
+  </script>
+</body>
+</html>
