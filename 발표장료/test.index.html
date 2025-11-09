@@ -6,125 +6,253 @@
 <title>AI로 구현한 스마트 교육운영 (Demo)</title>
 <style>
 :root{
- --bg:#ffffff; --bg2:#FBFCFE; --ink:#0F172A; --muted:#607089;
- --line:#E6EAF0; --line2:#D7DDE6; --soft:#F6F8FB;
- --primary:#A50034; --accent:#1D4ED8; --ok:#059669; --warn:#C2410C; --info:#0EA5E9;
- --radius:20px; --radius-lg:28px; --shadow:0 8px 30px rgba(15,23,42,.06);
+ /* 컬러 – 화이트 베이스 */
+ --bg:#F5F5F7;
+ --bg2:#FFFFFF;
+ --panel:#FFFFFF;
+ --panel-soft:#F9FAFB;
+ --surface:#FFFFFF;
+ --ink:#111827;
+ --muted:#6B7280;
+ --line:#E5E7EB;
+ --accent:#0EA5E9;
+ --accent-soft:#DBF4FF;
+ --primary:#A50034;
+ --ok:#16A34A;
+ --warn:#EA580C;
+ --info:#0EA5E9;
+ --radius:20px;
+ --radius-lg:26px;
+ --shadow-lg:0 18px 45px rgba(15,23,42,0.12);
 }
 
-/* 기본 타이포: 고정 px로 줄바꿈 안정화 */
+/* 기본 타이포 */
 html,body{
- margin:0; padding:0; background:var(--bg); color:var(--ink);
- font-family:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
- -webkit-font-smoothing:antialiased; font-smooth:always;
- letter-spacing:.01em; line-height:1.6;
+ margin:0; padding:0;
+ background:var(--bg);
+ color:var(--ink);
+ font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ -webkit-font-smoothing:antialiased;
+ letter-spacing:.01em;
+ line-height:1.6;
 }
-[lang="en"], .en{font-family:Arial,Helvetica,sans-serif;letter-spacing:.01em}
+[lang="en"], .en{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;letter-spacing:.02em}
 
-/* 레이아웃 */
-@page{ size:A4 landscape; margin:10mm }
+/* 뷰포트/덱 */
 .viewport{
- width:100vw; height:100vh; overflow:hidden; background:var(--bg);
+ width:100vw; height:100vh;
+ overflow:hidden;
+ position:relative;
+ background:var(--bg);
 }
 .deck{
  display:flex; flex-direction:row; height:100%;
  transform:translateX(0); transition:transform .8s cubic-bezier(.22,.8,.22,1);
  will-change:transform;
 }
+
+/* 슬라이드 */
 .slide{
  min-width:100%; height:100%;
- background:linear-gradient(180deg,var(--bg),var(--bg2));
- border:.4mm solid var(--line); border-radius:var(--radius-lg);
- margin:0; position:relative; overflow:hidden;
+ padding:36px 0;
+ box-sizing:border-box;
+ position:relative; overflow:hidden;
  display:flex; flex-direction:column; justify-content:center; align-items:center;
- box-shadow:var(--shadow);
+}
+.slide::before{
+ content:"";
+ position:absolute; inset:18px 20px;
+ border-radius:var(--radius-lg);
+ background:
+   radial-gradient(circle at top left,rgba(148,163,184,0.18) 0,transparent 48%),
+   radial-gradient(circle at bottom right,rgba(203,213,225,0.22) 0,transparent 55%);
+ opacity:.4;
+ pointer-events:none;
 }
 .inner{
- width:1280px;           /* 가로 널찍하게 고정 */
- max-width:94vw;
- margin:0 auto;
  position:relative;
+ z-index:1;
+ width:1250px;
+ max-width:92vw;
+ margin:0 auto;
+ padding:24px 26px 24px;
+ border-radius:var(--radius-lg);
+ background:var(--panel);
+ box-shadow:var(--shadow-lg);
+ border:1px solid rgba(148,163,184,0.22);
 }
 
 /* 상단 라인 */
 .topbar{
- position:absolute;top:0;left:0;right:0;
- height:3mm;
- background:linear-gradient(90deg,var(--primary),#c61f53)
+ position:absolute;top:18px;left:50%;
+ transform:translateX(-50%);
+ width:120px;height:3px;
+ border-radius:999px;
+ background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
+ opacity:.9;
 }
 
 /* 페이지 번호 */
 .sno{
- position:absolute; right:24px; bottom:20px; font-size:12px; color:#6B7280; background:#fff;
- border:1px solid var(--line); border-radius:999px; padding:6px 12px; box-shadow:0 0 6px rgba(0,0,0,.05)
+ position:absolute; right:32px; bottom:26px;
+ font-size:11px; color:var(--muted);
+ background:#FFFFFF;
+ border:1px solid rgba(148,163,184,0.45);
+ border-radius:999px;
+ padding:6px 12px;
+ box-shadow:0 8px 20px rgba(15,23,42,.15);
+ z-index:2;
 }
 
-/* Headings & text (고정 px) */
-h1,h2,h3{margin:0 0 14px 0; line-height:1.2}
+/* 섹션 태그 */
+.section-tag{
+ display:inline-flex;
+ align-items:center;
+ gap:6px;
+ padding:4px 10px;
+ border-radius:999px;
+ background:#FFFFFF;
+ border:1px solid rgba(148,163,184,0.55);
+ color:var(--muted);
+ font-size:11px;
+ text-transform:uppercase;
+ letter-spacing:.12em;
+ margin-bottom:10px;
+}
+.section-tag-dot{
+ width:7px;height:7px;border-radius:999px;
+ background:radial-gradient(circle,#0EA5E9 0,#0369A1 40%,transparent 65%);
+ box-shadow:0 0 6px rgba(14,165,233,0.8);
+}
+
+/* 타이포 */
+h1,h2,h3{margin:0 0 14px 0; line-height:1.18}
 h1{
- font-size:44px;
+ font-size:42px;
  font-weight:900;
- letter-spacing:-0.03em;
- margin-bottom:22px;
+ letter-spacing:-0.04em;
+ margin-bottom:18px;
 }
 h2{
- font-size:32px;
+ font-size:30px;
  font-weight:900;
- letter-spacing:-0.02em;
- margin-bottom:22px;
+ letter-spacing:-0.035em;
+ margin-bottom:18px;
+ position:relative;
+ padding-left:12px;
+}
+h2::before{
+ content:"";
+ position:absolute;
+ left:0;top:8px;bottom:6px;
+ width:4px;
+ border-radius:999px;
+ background:linear-gradient(180deg,#0EA5E9,#A50034);
 }
 h3{
- font-size:20px;
+ font-size:18px;
  font-weight:800;
  letter-spacing:-0.01em;
  margin-bottom:8px;
 }
+
 p,li{
- font-size:15px;
- line-height:1.65;
+ font-size:14px;
+ line-height:1.7;
 }
-p{margin:8px 0 8px}
+p{margin:6px 0 8px}
 ul{margin:4px 0 0 0; padding-left:18px}
 li+li{margin-top:2px}
-.small{font-size:13px; color:var(--muted)}
-.sub{font-size:18px; color:#444B59; letter-spacing:-.01em}
+.small{font-size:12px; color:var(--muted)}
+.sub{font-size:16px; color:#374151; letter-spacing:-.01em}
 hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 
-/* Grids & cards */
-.grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
-.grid-2b{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
-.grid-3{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:18px;
-}
+/* 그리드 & 카드 */
+.grid-2{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;margin-top:6px}
+.grid-2b{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:6px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:6px}
+
 .card{
- border:1px solid var(--line); border-radius:var(--radius); background:#fff; padding:18px 20px;
- box-shadow:0 .3mm 0 #F3F5F8 inset; transition:transform .2s ease, box-shadow .2s ease
+ border-radius:var(--radius);
+ padding:16px 18px 16px;
+ background:
+   linear-gradient(145deg,#FFFFFF,#F9FAFB);
+ border:1px solid rgba(148,163,184,0.4);
+ box-shadow:0 10px 26px rgba(15,23,42,0.08);
+ transition:transform .18s ease, box-shadow .18s ease, border .18s ease, background .18s ease;
 }
-.card:hover{transform:translateY(-1px); box-shadow:0 8px 22px rgba(0,0,0,.06)}
-.card h3{margin-bottom:8px}
+.card:hover{
+ transform:translateY(-2px);
+ box-shadow:0 18px 35px rgba(15,23,42,0.14);
+ border-color:rgba(14,165,233,0.85);
+ background:linear-gradient(145deg,#FFFFFF,#EFF6FF);
+}
+.card h3{
+ margin-bottom:6px;
+ color:#111827;
+}
 
-/* Table */
-.table{width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--line); border-radius:12px; overflow:hidden}
-.table th,.table td{padding:9px 12px; border-bottom:1px solid var(--line); font-size:14px; vertical-align:top}
-.table th{background:#F6F8FB; text-align:left; font-weight:800; color:#1E293B}
+/* 테이블 */
+.table{
+ width:100%;
+ border-collapse:separate;
+ border-spacing:0;
+ border-radius:16px;
+ overflow:hidden;
+ border:1px solid rgba(148,163,184,0.55);
+ background:#FFFFFF;
+}
+.table th,.table td{
+ padding:8px 12px;
+ border-bottom:1px solid #E5E7EB;
+ font-size:13px;
+ vertical-align:top;
+}
+.table th{
+ background:linear-gradient(135deg,#F3F4F6,#EFF6FF);
+ font-weight:800;
+ color:#1F2937;
+}
+.table tr:last-child td{border-bottom:none}
 
-/* Info blocks */
-.note{border-left:4px solid var(--info); background:#F1FAFF; border:1px solid #D8F1FF; border-radius:12px; padding:10px 12px}
-.tip{border-left:4px solid var(--ok);   background:#F0FFF7; border:1px solid #C8F3E0; border-radius:12px; padding:10px 12px}
-.risk{border-left:4px solid var(--warn); background:#FFF2E7; border:1px solid #FFD8BF; border-radius:12px; padding:10px 12px}
+/* 정보 블럭 */
+.note,.tip,.risk{
+ border-radius:14px;
+ padding:9px 11px;
+ font-size:13px;
+}
+.note{
+ border-left:4px solid var(--info);
+ background:#F0F9FF;
+ border:1px solid #BAE6FD;
+ color:#0F172A;
+}
+.tip{
+ border-left:4px solid var(--ok);
+ background:#ECFDF3;
+ border:1px solid #BBF7D0;
+}
+.risk{
+ border-left:4px solid var(--warn);
+ background:#FFF7ED;
+ border:1px solid #FED7AA;
+}
 
-/* Visuals */
+/* mock / 이미지 */
 .mock{
- border:1px dashed var(--line2); border-radius:12px;
- display:flex; align-items:center; justify-content:center;
- background:#fff; padding:8px;
+ border-radius:16px;
+ border:1px dashed #D1D5DB;
+ background:#F9FAFB;
+ padding:8px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ min-height:170px;
 }
-.mock span{color:#8A8F98; font-size:14px}
-.mock img{max-width:100%;height:auto;display:block;border-radius:10px}
+.mock span{color:var(--muted); font-size:14px}
+.mock img{max-width:100%;height:auto;display:block;border-radius:12px}
 
-/* Animations */
+/* 애니메이션 */
 .reveal{opacity:0; transform:translateY(10px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1)}
 .show{opacity:1; transform:none}
 .stagger>*{opacity:0; transform:translateY(8px)}
@@ -135,14 +263,14 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 .stagger.show>*:nth-child(4){transition-delay:.24s}
 .stagger.show>*:nth-child(5){transition-delay:.30s}
 
-/* 마지막장 헤드라인 */
+/* 마지막 슬라이드 */
 .thanks-title{
  position:relative;
  width:100%;
  text-align:center;
- font-size:40px;
+ font-size:32px;
  font-weight:900;
- letter-spacing:-0.04em;
+ letter-spacing:-0.05em;
  line-height:1.1;
  margin:0 auto 10px;
  color:var(--ink);
@@ -152,11 +280,11 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
  left:50%;
  bottom:-8px;
  height:3px;
- width:75%;
+ width:70%;
  transform:translateX(-50%) scaleX(0);
  transform-origin:left center;
  border-radius:999px;
- background:linear-gradient(90deg, var(--primary), #ff7a7a, var(--accent));
+ background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
  opacity:0;
  transition:transform .7s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
 }
@@ -164,74 +292,86 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
  transform:translateX(-50%) scaleX(1);
  opacity:1;
 }
-.slide-thanks .sub,
-.slide-thanks .tip,
-.slide-thanks .small{
- line-height: 2.2;
-}
 
 /* 로고 */
 .logo-biztechon{
- position:absolute; bottom:18px; right:22px; width:110px; height:auto; opacity:.9;
- filter:drop-shadow(0 0 2px rgba(0,0,0,.08)); pointer-events:none; user-select:none; z-index:50;
+ position:absolute; bottom:22px; right:26px; width:108px; height:auto; opacity:.9;
+ filter:drop-shadow(0 0 2px rgba(148,163,184,.6)); pointer-events:none; user-select:none; z-index:50;
 }
 .slide > .logo-biztechon{ position:absolute }
 
-/* Controls */
+/* 컨트롤 */
 .controls{
- position:absolute; left:50%; bottom:14px; transform:translateX(-50%);
+ position:absolute; left:50%; bottom:16px; transform:translateX(-50%);
  display:flex; align-items:center; gap:12px; font-size:13px;
  z-index:30;
 }
 .navbtns{display:flex; gap:8px}
 .ctrl{
- border:1px solid var(--line); background:#fff; border-radius:999px;
- padding:6px 12px; cursor:pointer; font-size:13px;
+ border-radius:999px;
+ padding:6px 12px;
+ border:1px solid rgba(148,163,184,0.7);
+ background:#FFFFFF;
+ color:#374151;
+ cursor:pointer;
+ font-size:12px;
+ display:inline-flex;
+ align-items:center;
+ gap:4px;
 }
-.ctrl:hover{background:#F3F4F6}
+.ctrl:hover{
+ background:#EFF6FF;
+ border-color:#0EA5E9;
+}
 .dots{display:flex; gap:6px}
 .dot{
- width:8px; height:8px; border-radius:999px;
- background:#D1D5DB; cursor:pointer;
+ width:7px; height:7px; border-radius:999px;
+ background:#D1D5DB;
+ cursor:pointer;
 }
-.dot.active{background:var(--primary)}
+.dot.active{
+ background:#0EA5E9;
+ box-shadow:0 0 0 4px rgba(14,165,233,0.2);
+}
 
-/* 상단 진행률 바 */
+/* 진행률 바 */
 .progress{
  position:absolute;
- top:3mm;
- left:0;
- width:100%;
- height:2.5mm;
- background:transparent;
+ top:10px;
+ left:50%;
+ transform:translateX(-50%);
+ width:260px;
+ height:4px;
+ border-radius:999px;
+ background:#E5E7EB;
+ border:1px solid #E5E7EB;
  z-index:30;
- pointer-events:none;
+ overflow:hidden;
 }
 .progress-inner{
  height:100%;
  width:0;
- border-radius:999px;
- background:linear-gradient(90deg, var(--primary), #ff7a7a, var(--accent));
- box-shadow:0 0 8px rgba(165,0,52,.35);
+ border-radius:inherit;
+ background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
+ box-shadow:0 0 6px rgba(59,130,246,0.8);
  transition:width .6s cubic-bezier(.22,.8,.22,1);
 }
 
 /* HTML CODE 배지 */
 .html-pill{
  position:absolute;
- top:8px;
- right:20px;
+ top:18px;
+ right:26px;
  display:inline-flex;
  align-items:center;
  gap:6px;
  padding:6px 10px;
  border-radius:999px;
- border:1px solid rgba(15,23,42,.08);
- background:rgba(255,255,255,.9);
- backdrop-filter:blur(8px);
- box-shadow:0 4px 12px rgba(15,23,42,.08);
+ border:1px solid rgba(148,163,184,0.7);
+ background:#FFFFFF;
+ box-shadow:0 8px 24px rgba(15,23,42,0.12);
  font-size:11px;
- color:#111827;
+ color:#4B5563;
  z-index:40;
 }
 .html-pill .code{
@@ -239,46 +379,48 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
  font-size:12px;
  padding:2px 6px;
  border-radius:999px;
- background:rgba(165,0,52,.08);
- color:var(--primary);
+ background:#EFF6FF;
+ color:#0EA5E9;
 }
 .html-pill .label{
  text-transform:uppercase;
- letter-spacing:.08em;
+ letter-spacing:.12em;
  font-weight:600;
-}
-.html-pill:hover{
- box-shadow:0 6px 18px rgba(15,23,42,.16);
- transform:translateY(-1px);
- transition:all .2s ease;
+ color:#6B7280;
 }
 
-/* 조작 힌트 */
+/* 힌트 */
 .hint{
  position:absolute;
- left:20px;
- bottom:16px;
+ left:26px;
+ bottom:18px;
  font-size:11px;
  color:#6B7280;
- background:rgba(255,255,255,.9);
- padding:4px 8px;
+ background:#FFFFFF;
+ padding:4px 10px;
  border-radius:999px;
- border:1px solid rgba(148,163,184,.4);
+ border:1px solid rgba(148,163,184,0.7);
  z-index:35;
 }
 
-/* 인쇄용 */
+/* 인쇄 */
 @media print{
- .viewport{overflow:visible}
+ body{background:#FFFFFF;}
+ .viewport{overflow:visible; background:#FFFFFF;}
  .deck{display:block; transform:none}
  .slide{
-   min-width:auto; height:210mm; width:297mm; margin:10mm auto; break-after:page;
-   border:none; border-radius:0; box-shadow:none
+   min-width:auto; height:210mm; width:297mm; margin:10mm auto;
+   padding:0;
+   break-after:page;
  }
- .controls{display:none}
- .progress{display:none}
- .html-pill{display:none}
- .hint{display:none}
+ .slide::before{display:none}
+ .inner{
+   box-shadow:none;
+   border-radius:0;
+   border:none;
+   width:auto; max-width:none;
+ }
+ .controls,.progress,.html-pill,.hint{display:none}
  .reveal,
  .stagger > *{
    opacity:1 !important;
@@ -290,19 +432,21 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <body>
 <div class="viewport">
 
-<!-- 진행률 바 -->
 <div class="progress">
   <div class="progress-inner" id="progressInner"></div>
 </div>
 
-<!-- 슬라이드 덱 -->
 <div class="deck" id="deck">
 
 <!-- 1. 표지 -->
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
-<h1 class="reveal">AI로 구현한 스마트 교육운영 (Demo)</h1>
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Education Operation · Demo</span>
+</div>
+<h1 class="reveal">AI로 구현한 스마트 교육운영</h1>
 <p class="sub reveal">사내 도구와 AI로 만든 실무형 자동화 파일럿</p>
 <hr class="sep">
 <p class="small reveal">교육운영파트 김미진 사원 · 2025-11-03</p>
@@ -314,12 +458,16 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Context</span>
+</div>
 <h2 class="reveal">왜 지금, 왜 사내 도구인가?</h2>
 <div class="grid-2b stagger">
  <div class="card">
    <h3>Why now?</h3>
    <ul>
-     <li>교육 안내·보고 메일 다수를 수기 작성</li>
+     <li>교육 안내·보고 메일을 연간 다수 수기 작성</li>
      <li>담당자·과정마다 서식·문체가 달라 검수 공수 증가</li>
      <li>해킹대회·세미나 확대 → 오류·누락 리스크 커짐</li>
    </ul>
@@ -344,6 +492,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Problem & Goals</span>
+</div>
 <h2 class="reveal">현황 · 문제 인식 · 개선 목표</h2>
 <div class="grid-3 stagger">
  <div class="card">
@@ -382,12 +534,16 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Overview</span>
+</div>
 <h2 class="reveal">이번에 직접 개선한 3가지</h2>
 <div class="grid-3 stagger">
  <div class="card">
    <h3>① HTML 템플릿 (메일·인쇄)</h3>
    <ul>
-     <li>공지 메일·인쇄물을 <b>단일 HTML</b>로 생성</li>
+     <li>공지 메일·인쇄물을 <b>단일 HTML</b> 템플릿으로 생성</li>
      <li>Outlook·EP 메일 호환, 레이아웃 깨짐 최소화</li>
      <li>운영 원칙: <b>단순 · 일정</b></li>
    </ul>
@@ -416,10 +572,14 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="sno">4</div>
 </section>
 
-<!-- 5. 개선 1 – HTML 템플릿 (메일·인쇄) -->
+<!-- 5. 개선 1 – HTML 템플릿 -->
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Demo 1 · HTML Template</span>
+</div>
 <h2 class="reveal">개선 1 – HTML 템플릿 (메일·인쇄)</h2>
 <div class="grid-2">
  <div class="card reveal">
@@ -436,7 +596,6 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
  <div class="card reveal">
    <h3>After · HTML 템플릿 1종 통일</h3>
    <div class="mock">
-     <!-- ★ 실제 메일 템플릿 캡처 이미지로 교체 -->
      <img src="images/mail_template_sample.png" alt="HTML 메일 템플릿 예시">
    </div>
    <ul style="margin-top:8px">
@@ -445,7 +604,7 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
      <li>제작 시간 약 7분, 약 80% 단축</li>
    </ul>
    <p class="small">
-     ※ 이미지는 <code>images/mail_template_sample.png</code>를 실제 캡처 이미지로 교체해 사용.
+     ※ 이미지는 <code>images/mail_template_sample.png</code>를 실제 캡처로 교체해 사용.
    </p>
  </div>
 </div>
@@ -457,6 +616,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Demo 2 · Opening Site</span>
+</div>
 <h2 class="reveal">개선 2 – 개강 안내 사이트</h2>
 <div class="grid-2">
  <div class="card reveal">
@@ -470,7 +633,7 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
      데모에서는 <b>개강 안내 사이트만</b> 브라우저 링크로 직접 접속해 보여드립니다.
    </div>
    <p class="small" style="margin-top:6px">
-     (운영 URL 예시) <br>
+     (운영 URL 예시)&nbsp;
      <a class="en" href="https://example.com/magok-lecture-guide" target="_blank">
        https://example.com/magok-lecture-guide
      </a><br>
@@ -480,7 +643,6 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
  <div class="card reveal">
    <h3>화면 예시</h3>
    <div class="mock">
-     <!-- ★ 개강 안내 사이트 캡처 이미지 -->
      <img src="images/lecture_guide_sample.png" alt="개강 안내 사이트 예시">
    </div>
    <p class="small">
@@ -493,10 +655,14 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="sno">6</div>
 </section>
 
-<!-- 7. 개선 3 – 세미나 출석 흐름 -->
+<!-- 7. 개선 3 – 세미나 출석 -->
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Demo 3 · Attendance</span>
+</div>
 <h2 class="reveal">개선 3 – 세미나 출석 흐름</h2>
 <div class="grid-3 stagger">
  <div class="card">
@@ -531,10 +697,14 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="sno">7</div>
 </section>
 
-<!-- 8. 토큰 & CSV 기반 구조 -->
+<!-- 8. 토큰 & CSV -->
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Structure</span>
+</div>
 <h2 class="reveal">토큰 & CSV 기반 구조</h2>
 <table class="table reveal">
  <tr><th>토큰</th><th>설명</th><th>예시</th><th>규칙</th></tr>
@@ -558,6 +728,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Impact</span>
+</div>
 <h2 class="reveal">성과 요약</h2>
 <table class="table reveal">
 <tr><th>항목</th><th>Before</th><th>After</th><th>변화</th></tr>
@@ -579,6 +753,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Extension</span>
+</div>
 <h2 class="reveal">기능 활용성</h2>
 <div class="grid-2b stagger">
  <div class="card">
@@ -609,6 +787,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Next Step</span>
+</div>
 <h2 class="reveal">향후 계획</h2>
 <table class="table reveal">
  <tr><th>현재 구현</th><th>향후 디벨롭 방향</th></tr>
@@ -655,6 +837,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>How-to · AI</span>
+</div>
 <h2 class="reveal">프롬프트 & 코파일럿 활용 팁</h2>
 <div class="grid-2b stagger">
  <div class="card">
@@ -691,6 +877,10 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>FAQ</span>
+</div>
 <h2 class="reveal">FAQ</h2>
 <div class="grid-2b stagger">
  <div class="card">
@@ -727,16 +917,20 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <section class="slide">
 <div class="topbar"></div>
 <div class="inner">
+<div class="section-tag reveal">
+  <span class="section-tag-dot"></span>
+  <span>Summary</span>
+</div>
 <h2 class="reveal">결론</h2>
 <p class="sub reveal">
 <b>운영의 품질 = 경험의 품질</b><br>
 작은 정리가 현장의 체감을 크게 바꿉니다.
 </p>
 <div class="note reveal" style="margin-top:14px">
- <ol style="margin-left:16px; font-size:16px; line-height:1.8">
+ <ol style="margin-left:16px; font-size:15px; line-height:1.8">
    <b>실행 포인트</b>
  </ol>
- <ol style="margin-left:16px; font-size:14px; line-height:1.8">
+ <ol style="margin-left:16px; font-size:13px; line-height:1.8">
    <li>반복 업무를 줄이고, 표준 템플릿을 제공한다.</li>
    <li>사내 도구와 간단한 코드로 누구나 쓸 수 있게 만든다.</li>
    <li>업무 개선 경험을 팀 단위로 공유·확산한다.</li>
@@ -780,13 +974,11 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
  <div class="dots" id="dots" aria-label="슬라이드 이동 도트"></div>
 </div>
 
-<!-- HTML CODE 배지 -->
 <div class="html-pill">
   <span class="code">&lt;/&gt;</span>
-  <span class="label">HTML CODE Demo</span>
+  <span class="label">HTML CODE DEMO</span>
 </div>
 
-<!-- 조작 힌트 -->
 <div class="hint">
   ← / → 또는 클릭으로 슬라이드 이동
 </div>
@@ -864,7 +1056,6 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
    if(e.key==='ArrowLeft')  show(current-1);
  });
 
- // 터치 스와이프
  let startX=null;
  deck.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }, {passive:true});
  deck.addEventListener('touchend', (e)=>{
