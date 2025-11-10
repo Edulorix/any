@@ -6,175 +6,175 @@
 <title>AI로 구현한 스마트 교육운영 (Demo)</title>
 <style>
 :root{
- /* 컬러 – 화이트 베이스 + 살짝 럭셔리 포인트 */
- --bg:#F4F5F7;
- --bg2:#FFFFFF;
- --panel:#FFFFFF;
- --panel-soft:#F9FAFB;
- --surface:#FFFFFF;
- --ink:#111827;
- --muted:#6B7280;
- --line:#E5E7EB;
- --accent:#0EA5E9;
- --accent-soft:#DBF4FF;
- --primary:#A50034;
- --accent2:#6366F1;
- --ok:#16A34A;
- --warn:#EA580C;
- --info:#0EA5E9;
- --radius:20px;
- --radius-lg:26px;
- --shadow-lg:0 22px 55px rgba(15,23,42,0.16);
+/* 컬러 – 화이트 베이스 + 살짝 럭셔리 포인트 */
+--bg:#F4F5F7;
+--bg2:#FFFFFF;
+--panel:#FFFFFF;
+--panel-soft:#F9FAFB;
+--surface:#FFFFFF;
+--ink:#111827;
+--muted:#6B7280;
+--line:#E5E7EB;
+--accent:#0EA5E9;
+--accent-soft:#DBF4FF;
+--primary:#A50034;
+--accent2:#6366F1;
+--ok:#16A34A;
+--warn:#EA580C;
+--info:#0EA5E9;
+--radius:20px;
+--radius-lg:26px;
+--shadow-lg:0 22px 55px rgba(15,23,42,0.16);
 }
 
 /* 기본 타이포 */
 html,body{
- margin:0; padding:0;
- background:var(--bg);
- color:var(--ink);
- font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
- -webkit-font-smoothing:antialiased;
- letter-spacing:.01em;
- line-height:1.6;
+margin:0; padding:0;
+background:var(--bg);
+color:var(--ink);
+font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+-webkit-font-smoothing:antialiased;
+letter-spacing:.01em;
+line-height:1.6;
 }
 [lang="en"], .en{
- font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
- letter-spacing:.02em;
+font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+letter-spacing:.02em;
 }
 
 /* 뷰포트/덱 */
 .viewport{
- width:100vw; height:100vh;
- overflow:hidden;
- position:relative;
- background:
-   radial-gradient(circle at 0% 0%,rgba(148,163,184,0.25) 0,transparent 45%),
-   radial-gradient(circle at 100% 100%,rgba(209,213,219,0.28) 0,transparent 50%),
-   var(--bg);
+width:100vw; height:100vh;
+overflow:hidden;
+position:relative;
+background:
+radial-gradient(circle at 0% 0%,rgba(148,163,184,0.25) 0,transparent 45%),
+radial-gradient(circle at 100% 100%,rgba(209,213,219,0.28) 0,transparent 50%),
+var(--bg);
 }
 .deck{
- display:flex; flex-direction:row; height:100%;
- transform:translateX(0); transition:transform .8s cubic-bezier(.22,.8,.22,1);
- will-change:transform;
+display:flex; flex-direction:row; height:100%;
+transform:translateX(0); transition:transform .8s cubic-bezier(.22,.8,.22,1);
+will-change:transform;
 }
 
 /* 슬라이드 */
 .slide{
- min-width:100%; height:100%;
- padding:40px 0;
- box-sizing:border-box;
- position:relative; overflow:hidden;
- display:flex; flex-direction:column; justify-content:center; align-items:center;
+min-width:100%; height:100%;
+padding:40px 0;
+box-sizing:border-box;
+position:relative; overflow:hidden;
+display:flex; flex-direction:column; justify-content:center; align-items:center;
 }
 .slide::before{
- content:"";
- position:absolute; inset:18px 22px;
- border-radius:32px;
- background:
-   radial-gradient(circle at 0 0,rgba(255,255,255,0.9) 0,rgba(255,255,255,0.7) 28%,transparent 55%),
-   radial-gradient(circle at 100% 100%,rgba(248,250,252,0.95) 0,rgba(241,245,249,0.7) 28%,transparent 60%);
- box-shadow:0 12px 40px rgba(148,163,184,0.3);
- opacity:.88;
- pointer-events:none;
+content:"";
+position:absolute; inset:18px 22px;
+border-radius:32px;
+background:
+radial-gradient(circle at 0 0,rgba(255,255,255,0.9) 0,rgba(255,255,255,0.7) 28%,transparent 55%),
+radial-gradient(circle at 100% 100%,rgba(248,250,252,0.95) 0,rgba(241,245,249,0.7) 28%,transparent 60%);
+box-shadow:0 12px 40px rgba(148,163,184,0.3);
+opacity:.88;
+pointer-events:none;
 }
 .inner{
- position:relative;
- z-index:1;
- width:1250px;
- max-width:92vw;
- margin:0 auto;
- padding:26px 30px 24px;
- border-radius:28px;
- background:linear-gradient(145deg,#FFFFFF,#F9FAFB);
- box-shadow:var(--shadow-lg);
- border:1px solid rgba(148,163,184,0.18);
+position:relative;
+z-index:1;
+width:1250px;
+max-width:92vw;
+margin:0 auto;
+padding:26px 30px 24px;
+border-radius:28px;
+background:linear-gradient(145deg,#FFFFFF,#F9FAFB);
+box-shadow:var(--shadow-lg);
+border:1px solid rgba(148,163,184,0.18);
 }
 
 /* 상단 라인(슬라이드 리본) */
 .topbar{
- position:absolute;
- top:24px;
- left:50%;
- transform:translateX(-50%);
- width:220px;
- height:5px;
- border-radius:999px;
- background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
- box-shadow:
-   0 0 0 1px rgba(255,255,255,0.9),
-   0 4px 14px rgba(148,163,184,0.65);
- opacity:.9;
+position:absolute;
+top:24px;
+left:50%;
+transform:translateX(-50%);
+width:220px;
+height:5px;
+border-radius:999px;
+background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
+box-shadow:
+0 0 0 1px rgba(255,255,255,0.9),
+0 4px 14px rgba(148,163,184,0.65);
+opacity:.9;
 }
 
 /* 페이지 번호 */
 .sno{
- position:absolute; right:40px; bottom:30px;
- font-size:11px; color:var(--muted);
- background:#FFFFFF;
- border:1px solid rgba(148,163,184,0.55);
- border-radius:999px;
- padding:6px 14px;
- box-shadow:0 10px 24px rgba(15,23,42,.18);
- z-index:2;
+position:absolute; right:40px; bottom:30px;
+font-size:11px; color:var(--muted);
+background:#FFFFFF;
+border:1px solid rgba(148,163,184,0.55);
+border-radius:999px;
+padding:6px 14px;
+box-shadow:0 10px 24px rgba(15,23,42,.18);
+z-index:2;
 }
 
 /* 섹션 태그 */
 .section-tag{
- display:inline-flex;
- align-items:center;
- gap:6px;
- padding:4px 11px;
- border-radius:999px;
- background:rgba(255,255,255,0.9);
- border:1px solid rgba(148,163,184,0.7);
- color:var(--muted);
- font-size:11px;
- text-transform:uppercase;
- letter-spacing:.12em;
- margin-bottom:10px;
- box-shadow:0 6px 18px rgba(148,163,184,0.35);
+display:inline-flex;
+align-items:center;
+gap:6px;
+padding:4px 11px;
+border-radius:999px;
+background:rgba(255,255,255,0.9);
+border:1px solid rgba(148,163,184,0.7);
+color:var(--muted);
+font-size:11px;
+text-transform:uppercase;
+letter-spacing:.12em;
+margin-bottom:10px;
+box-shadow:0 6px 18px rgba(148,163,184,0.35);
 }
 .section-tag-dot{
- width:7px;height:7px;border-radius:999px;
- background:radial-gradient(circle,#0EA5E9 0,#0369A1 36%,transparent 70%);
- box-shadow:0 0 8px rgba(14,165,233,0.85);
+width:7px;height:7px;border-radius:999px;
+background:radial-gradient(circle,#0EA5E9 0,#0369A1 36%,transparent 70%);
+box-shadow:0 0 8px rgba(14,165,233,0.85);
 }
 
 /* 타이포 */
 h1,h2,h3{margin:0 0 14px 0; line-height:1.18}
 h1{
- font-size:42px;
- font-weight:900;
- letter-spacing:-0.04em;
- margin-bottom:18px;
+font-size:42px;
+font-weight:900;
+letter-spacing:-0.04em;
+margin-bottom:18px;
 }
 h2{
- font-size:30px;
- font-weight:900;
- letter-spacing:-0.035em;
- margin-bottom:18px;
- position:relative;
- padding-left:14px;
+font-size:30px;
+font-weight:900;
+letter-spacing:-0.035em;
+margin-bottom:18px;
+position:relative;
+padding-left:14px;
 }
 h2::before{
- content:"";
- position:absolute;
- left:0;top:7px;bottom:7px;
- width:3px;
- border-radius:999px;
- background:linear-gradient(180deg,#0EA5E9,#A50034,#6366F1);
- box-shadow:0 0 6px rgba(59,130,246,0.6);
+content:"";
+position:absolute;
+left:0;top:7px;bottom:7px;
+width:3px;
+border-radius:999px;
+background:linear-gradient(180deg,#0EA5E9,#A50034,#6366F1);
+box-shadow:0 0 6px rgba(59,130,246,0.6);
 }
 h3{
- font-size:18px;
- font-weight:800;
- letter-spacing:-0.01em;
- margin-bottom:8px;
+font-size:18px;
+font-weight:800;
+letter-spacing:-0.01em;
+margin-bottom:8px;
 }
 
 p,li{
- font-size:14px;
- line-height:1.7;
+font-size:14px;
+line-height:1.7;
 }
 p{margin:6px 0 8px}
 ul{margin:4px 0 0 0; padding-left:18px}
@@ -183,90 +183,117 @@ li+li{margin-top:2px}
 .sub{font-size:16px; color:#374151; letter-spacing:-.01em}
 hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 
+/* 핵심 한 줄 요약 */
+.keyline{
+margin-top:6px;
+margin-bottom:6px;
+padding:8px 12px;
+border-radius:14px;
+background:#020617;
+color:#E5E7EB;
+font-size:13px;
+font-weight:600;
+display:inline-flex;
+align-items:center;
+gap:8px;
+box-shadow:0 10px 26px rgba(15,23,42,0.45);
+}
+.keyline::before{
+content:"★";
+font-size:12px;
+color:#FACC15;
+}
+.keyline b{
+color:#38BDF8;
+}
+
 /* 그리드 & 카드 */
 .grid-2{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;margin-top:6px}
 .grid-2b{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:6px}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:6px}
 
 .card{
- border-radius:var(--radius);
- padding:16px 18px 16px;
- background:linear-gradient(145deg,#FFFFFF,#F9FAFB);
- border:1px solid rgba(148,163,184,0.45);
- box-shadow:0 10px 28px rgba(15,23,42,0.08);
- transition:
-   transform .18s ease,
-   box-shadow .18s ease,
-   border .18s ease,
-   background .18s ease;
+border-radius:var(--radius);
+padding:16px 18px 16px;
+background:linear-gradient(145deg,#FFFFFF,#F9FAFB);
+border:1px solid rgba(148,163,184,0.45);
+box-shadow:0 10px 28px rgba(15,23,42,0.08);
+transition:
+transform .18s ease,
+box-shadow .18s ease,
+border .18s ease,
+background .18s ease;
 }
 .card:hover{
- transform:translateY(-2px);
- box-shadow:0 20px 40px rgba(15,23,42,0.16);
- border-color:rgba(14,165,233,0.9);
- background:linear-gradient(145deg,#FFFFFF,#EEF5FF);
+transform:translateY(-2px);
+box-shadow:0 20px 40px rgba(15,23,42,0.16);
+border-color:rgba(14,165,233,0.9);
+background:linear-gradient(145deg,#FFFFFF,#EEF5FF);
 }
 .card h3{
- margin-bottom:6px;
- color:#111827;
+margin-bottom:6px;
+color:#111827;
 }
 
 /* 테이블 */
 .table{
- width:100%;
- border-collapse:separate;
- border-spacing:0;
- border-radius:18px;
- overflow:hidden;
- border:1px solid rgba(148,163,184,0.6);
- background:#FFFFFF;
+width:100%;
+border-collapse:separate;
+border-spacing:0;
+border-radius:18px;
+overflow:hidden;
+border:1px solid rgba(148,163,184,0.6);
+background:#FFFFFF;
 }
 .table th,.table td{
- padding:9px 12px;
- border-bottom:1px solid #E5E7EB;
- font-size:13px;
- vertical-align:top;
+padding:9px 12px;
+border-bottom:1px solid #E5E7EB;
+font-size:13px;
+vertical-align:top;
 }
 .table th{
- background:linear-gradient(135deg,#F3F4F6,#E5EEFF);
- font-weight:800;
- color:#111827;
+background:linear-gradient(135deg,#F3F4F6,#E5EEFF);
+font-weight:800;
+color:#111827;
+}
+.table tr:nth-child(even) td{
+background:#F9FAFB;
 }
 .table tr:last-child td{border-bottom:none}
 
 /* 정보 블럭 */
 .note,.tip,.risk{
- border-radius:14px;
- padding:9px 11px;
- font-size:13px;
+border-radius:14px;
+padding:9px 11px;
+font-size:13px;
 }
 .note{
- border-left:4px solid var(--info);
- background:#F0F9FF;
- border:1px solid #BAE6FD;
- color:#0F172A;
+border-left:4px solid var(--info);
+background:#F0F9FF;
+border:1px solid #BAE6FD;
+color:#0F172A;
 }
 .tip{
- border-left:4px solid var(--ok);
- background:#ECFDF3;
- border:1px solid #BBF7D0;
+border-left:4px solid var(--ok);
+background:#ECFDF3;
+border:1px solid #BBF7D0;
 }
 .risk{
- border-left:4px solid var(--warn);
- background:#FFF7ED;
- border:1px solid #FED7AA;
+border-left:4px solid var(--warn);
+background:#FFF7ED;
+border:1px solid #FED7AA;
 }
 
 /* mock / 이미지 */
 .mock{
- border-radius:18px;
- border:1px dashed #D1D5DB;
- background:#F9FAFB;
- padding:8px;
- display:flex;
- align-items:center;
- justify-content:center;
- min-height:170px;
+border-radius:18px;
+border:1px dashed #D1D5DB;
+background:#F9FAFB;
+padding:8px;
+display:flex;
+align-items:center;
+justify-content:center;
+min-height:170px;
 }
 .mock span{color:var(--muted); font-size:14px}
 .mock img{max-width:100%;height:auto;display:block;border-radius:12px}
@@ -284,183 +311,183 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 
 /* 마지막 슬라이드 */
 .thanks-title{
- position:relative;
- width:100%;
- text-align:center;
- font-size:32px;
- font-weight:900;
- letter-spacing:-0.05em;
- line-height:1.1;
- margin:0 auto 10px;
- color:var(--ink);
+position:relative;
+width:100%;
+text-align:center;
+font-size:32px;
+font-weight:900;
+letter-spacing:-0.05em;
+line-height:1.1;
+margin:0 auto 10px;
+color:var(--ink);
 }
 .thanks-title .thanks-underline{
- position:absolute;
- left:50%;
- bottom:-8px;
- height:3px;
- width:70%;
- transform:translateX(-50%) scaleX(0);
- transform-origin:left center;
- border-radius:999px;
- background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
- box-shadow:0 0 8px rgba(59,130,246,0.7);
- opacity:0;
- transition:transform .7s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
+position:absolute;
+left:50%;
+bottom:-8px;
+height:3px;
+width:70%;
+transform:translateX(-50%) scaleX(0);
+transform-origin:left center;
+border-radius:999px;
+background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
+box-shadow:0 0 8px rgba(59,130,246,0.7);
+opacity:0;
+transition:transform .7s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
 }
 .thanks-title.show .thanks-underline{
- transform:translateX(-50%) scaleX(1);
- opacity:1;
+transform:translateX(-50%) scaleX(1);
+opacity:1;
 }
 
 /* 로고 */
 .logo-biztechon{
- position:absolute; bottom:24px; right:32px;
- width:106px; height:auto; opacity:.96;
- filter:drop-shadow(0 2px 5px rgba(148,163,184,.8));
- pointer-events:none; user-select:none; z-index:50;
+position:absolute; bottom:24px; right:32px;
+width:106px; height:auto; opacity:.96;
+filter:drop-shadow(0 2px 5px rgba(148,163,184,.8));
+pointer-events:none; user-select:none; z-index:50;
 }
 .slide > .logo-biztechon{ position:absolute }
 
 /* 컨트롤 */
 .controls{
- position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
- display:flex; align-items:center; gap:12px; font-size:13px;
- z-index:30;
+position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
+display:flex; align-items:center; gap:12px; font-size:13px;
+z-index:30;
 }
 .navbtns{display:flex; gap:8px}
 .ctrl{
- border-radius:999px;
- padding:6px 13px;
- border:1px solid rgba(148,163,184,0.7);
- background:#FFFFFF;
- color:#374151;
- cursor:pointer;
- font-size:12px;
- display:inline-flex;
- align-items:center;
- gap:4px;
- box-shadow:0 8px 20px rgba(148,163,184,0.3);
+border-radius:999px;
+padding:6px 13px;
+border:1px solid rgba(148,163,184,0.7);
+background:#FFFFFF;
+color:#374151;
+cursor:pointer;
+font-size:12px;
+display:inline-flex;
+align-items:center;
+gap:4px;
+box-shadow:0 8px 20px rgba(148,163,184,0.3);
 }
 .ctrl:hover{
- background:#EFF6FF;
- border-color:#0EA5E9;
+background:#EFF6FF;
+border-color:#0EA5E9;
 }
 .dots{display:flex; gap:6px}
 .dot{
- width:7px; height:7px; border-radius:999px;
- background:#D1D5DB;
- cursor:pointer;
+width:7px; height:7px; border-radius:999px;
+background:#D1D5DB;
+cursor:pointer;
 }
 .dot.active{
- background:#0EA5E9;
- box-shadow:0 0 0 4px rgba(14,165,233,0.25);
+background:#0EA5E9;
+box-shadow:0 0 0 4px rgba(14,165,233,0.25);
 }
 
 /* 진행률 바 – 고급형 */
 .progress{
- position:absolute;
- top:10px;
- left:50%;
- transform:translateX(-50%);
- width:280px;
- height:8px;
- border-radius:999px;
- background:rgba(255,255,255,0.9);
- border:1px solid rgba(209,213,219,0.9);
- z-index:30;
- overflow:hidden;
- box-shadow:
-   0 6px 14px rgba(148,163,184,0.6),
-   0 0 0 1px rgba(255,255,255,0.9);
+position:absolute;
+top:10px;
+left:50%;
+transform:translateX(-50%);
+width:280px;
+height:8px;
+border-radius:999px;
+background:rgba(255,255,255,0.9);
+border:1px solid rgba(209,213,219,0.9);
+z-index:30;
+overflow:hidden;
+box-shadow:
+0 6px 14px rgba(148,163,184,0.6),
+0 0 0 1px rgba(255,255,255,0.9);
 }
 .progress-inner{
- height:100%;
- width:0;
- border-radius:inherit;
- background:linear-gradient(90deg,#0EA5E9,#22C55E,#A855F7,#A50034);
- background-size:200% 100%;
- box-shadow:0 0 10px rgba(56,189,248,0.75);
- transition:width .6s cubic-bezier(.22,.8,.22,1);
- animation:progressShimmer 4s linear infinite;
+height:100%;
+width:0;
+border-radius:inherit;
+background:linear-gradient(90deg,#0EA5E9,#22C55E,#A855F7,#A50034);
+background-size:200% 100%;
+box-shadow:0 0 10px rgba(56,189,248,0.75);
+transition:width .6s cubic-bezier(.22,.8,.22,1);
+animation:progressShimmer 4s linear infinite;
 }
 @keyframes progressShimmer{
- 0%{background-position:0% 50%}
- 100%{background-position:200% 50%}
+0%{background-position:0% 50%}
+100%{background-position:200% 50%}
 }
 
 /* HTML CODE 배지 */
 .html-pill{
- position:absolute;
- top:20px;
- right:32px;
- display:inline-flex;
- align-items:center;
- gap:6px;
- padding:6px 11px;
- border-radius:999px;
- border:1px solid rgba(148,163,184,0.7);
- background:rgba(255,255,255,0.96);
- box-shadow:0 10px 26px rgba(148,163,184,0.5);
- font-size:11px;
- color:#4B5563;
- z-index:40;
- backdrop-filter:blur(10px);
+position:absolute;
+top:20px;
+right:32px;
+display:inline-flex;
+align-items:center;
+gap:6px;
+padding:6px 11px;
+border-radius:999px;
+border:1px solid rgba(148,163,184,0.7);
+background:rgba(255,255,255,0.96);
+box-shadow:0 10px 26px rgba(148,163,184,0.5);
+font-size:11px;
+color:#4B5563;
+z-index:40;
+backdrop-filter:blur(10px);
 }
 .html-pill .code{
- font-family:Consolas, "Fira Code", monospace;
- font-size:12px;
- padding:2px 6px;
- border-radius:999px;
- background:#EFF6FF;
- color:#0EA5E9;
- box-shadow:0 0 0 1px rgba(191,219,254,0.9);
+font-family:Consolas, "Fira Code", monospace;
+font-size:12px;
+padding:2px 6px;
+border-radius:999px;
+background:#EFF6FF;
+color:#0EA5E9;
+box-shadow:0 0 0 1px rgba(191,219,254,0.9);
 }
 .html-pill .label{
- text-transform:uppercase;
- letter-spacing:.12em;
- font-weight:600;
- color:#6B7280;
+text-transform:uppercase;
+letter-spacing:.12em;
+font-weight:600;
+color:#6B7280;
 }
 
 /* 힌트 */
 .hint{
- position:absolute;
- left:32px;
- bottom:20px;
- font-size:11px;
- color:#6B7280;
- background:#FFFFFF;
- padding:4px 11px;
- border-radius:999px;
- border:1px solid rgba(148,163,184,0.7);
- box-shadow:0 8px 20px rgba(148,163,184,0.4);
- z-index:35;
+position:absolute;
+left:32px;
+bottom:20px;
+font-size:11px;
+color:#6B7280;
+background:#FFFFFF;
+padding:4px 11px;
+border-radius:999px;
+border:1px solid rgba(148,163,184,0.7);
+box-shadow:0 8px 20px rgba(148,163,184,0.4);
+z-index:35;
 }
 
 /* 인쇄 */
 @media print{
- body{background:#FFFFFF;}
- .viewport{overflow:visible; background:#FFFFFF;}
- .deck{display:block; transform:none}
- .slide{
-   min-width:auto; height:210mm; width:297mm; margin:10mm auto;
-   padding:0;
-   break-after:page;
- }
- .slide::before{display:none}
- .inner{
-   box-shadow:none;
-   border-radius:0;
-   border:none;
-   width:auto; max-width:none;
- }
- .controls,.progress,.html-pill,.hint{display:none}
- .reveal,
- .stagger > *{
-   opacity:1 !important;
-   transform:none !important;
- }
+body{background:#FFFFFF;}
+.viewport{overflow:visible; background:#FFFFFF;}
+.deck{display:block; transform:none}
+.slide{
+min-width:auto; height:210mm; width:297mm; margin:10mm auto;
+padding:0;
+break-after:page;
+}
+.slide::before{display:none}
+.inner{
+box-shadow:none;
+border-radius:0;
+border:none;
+width:auto; max-width:none;
+}
+.controls,.progress,.html-pill,.hint{display:none}
+.reveal,
+.stagger > *{
+opacity:1 !important;
+transform:none !important;
+}
 }
 </style>
 </head>
@@ -468,7 +495,7 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="viewport">
 
 <div class="progress">
-  <div class="progress-inner" id="progressInner"></div>
+<div class="progress-inner" id="progressInner"></div>
 </div>
 
 <div class="deck" id="deck">
@@ -478,11 +505,14 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Education Operation · Demo</span>
+<span class="section-tag-dot"></span>
+<span>Education Operation · Demo</span>
 </div>
 <h1 class="reveal">AI로 구현한 스마트 교육운영</h1>
 <p class="sub reveal">사내 도구와 AI로 만든 실무형 자동화 파일럿</p>
+<div class="keyline reveal">
+오늘 목표: <b>“실제 업무에 당장 쓸 수 있는 수준의 개선”</b>을 공유합니다.
+</div>
 <hr class="sep">
 <p class="small reveal">교육운영파트 김미진 사원 · 2025-11-03</p>
 </div>
@@ -494,29 +524,32 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Context</span>
+<span class="section-tag-dot"></span>
+<span>Context</span>
 </div>
 <h2 class="reveal">왜 지금, 왜 사내 도구인가?</h2>
+<div class="keyline reveal">
+<b>외부 솔루션 없이</b>도, 지금 가진 MS 도구와 AI만으로 <b>운영 품질을 끌어올릴 수 있는지</b>를 검증한 파일럿입니다.
+</div>
 <div class="grid-2b stagger">
  <div class="card">
-   <h3>Why now?</h3>
-   <ul>
-     <li>교육 안내·보고 메일을 연간 다수 수기 작성</li>
-     <li>담당자·과정마다 서식·문체가 달라 검수 공수 증가</li>
-     <li>해킹대회·세미나 확대 → 오류·누락 리스크 커짐</li>
-   </ul>
+<h3>Why now?</h3>
+<ul>
+<li>교육 안내·보고 메일을 연간 다수 수기 작성</li>
+<li>담당자·과정마다 서식·문체가 달라 검수 공수 증가</li>
+<li>해킹대회·세미나 확대 → 오류·누락 리스크 커짐</li>
+</ul>
  </div>
  <div class="card">
-   <h3>사내 도구 중심 운영</h3>
-   <ul>
-     <li>MS365 / Outlook / Teams / Forms 기반</li>
-     <li>외부 AI·툴 없이도 운영 가능한 구조</li>
-     <li>GitHub Copilot 등 사내 허용 AI로 보조 활용</li>
-   </ul>
-   <div class="note" style="margin-top:8px">
-     보안·권한 이슈 없이 <b>바로 확산</b> 가능한 수준의 파일럿입니다.
-   </div>
+<h3>사내 도구 중심 운영</h3>
+<ul>
+<li>MS365 / Outlook / Teams / Forms 기반</li>
+<li>외부 AI·툴 없이도 운영 가능한 구조</li>
+<li>GitHub Copilot 등 사내 허용 AI로 보조 활용</li>
+</ul>
+<div class="note" style="margin-top:8px">
+보안·권한 이슈 없이 <b>바로 확산</b> 가능한 수준의 파일럿입니다.
+</div>
  </div>
 </div>
 </div>
@@ -528,34 +561,37 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Problem & Goals</span>
+<span class="section-tag-dot"></span>
+<span>Problem & Goals</span>
 </div>
 <h2 class="reveal">현황 · 문제 인식 · 개선 목표</h2>
+<div class="keyline reveal">
+<b>“많이 바쁘지만, 늘 비슷한 일을 반복한다”</b>는 현장의 피로를 줄이는 것이 출발점이었습니다.
+</div>
 <div class="grid-3 stagger">
  <div class="card">
-   <h3>추진 배경</h3>
-   <ul>
-     <li>교육 안내·보고 문서 다수, 담당자별 형식 제각각</li>
-     <li>형식 검수·수정에 건당 20~30분 추가</li>
-     <li>대규모 행사 시 오류·재작성 공수 발생</li>
-   </ul>
+<h3>추진 배경</h3>
+<ul>
+<li>교육 안내·보고 문서 다수, 담당자별 형식 제각각</li>
+<li>형식 검수·수정에 건당 20~30분 추가</li>
+<li>대규모 행사 시 오류·재작성 공수 발생</li>
+</ul>
  </div>
  <div class="card">
-   <h3>현장의 문제 인식</h3>
-   <ul>
-     <li>과정명·일시·장소 매번 재입력 → 복붙 오타</li>
-     <li>폰트·여백·문체 불일치로 가독성 저하</li>
-     <li>출석·결과·보고 흐름이 끊겨 재작성 반복</li>
-   </ul>
+<h3>현장의 문제 인식</h3>
+<ul>
+<li>과정명·일시·장소 매번 재입력 → 복붙 오타</li>
+<li>폰트·여백·문체 불일치로 가독성 저하</li>
+<li>출석·결과·보고 흐름이 끊겨 재작성 반복</li>
+</ul>
  </div>
  <div class="card">
-   <h3>개선 목표 (운영 원칙)</h3>
-   <ul>
-     <li><b>단순 Simple</b> – 한 번 입력해 여러 단계 활용</li>
-     <li><b>일정 Steady</b> – 서식·문체 기준 통일</li>
-     <li><b>연결 Connected</b> – 공지→출석→보고 흐름 유지</li>
-   </ul>
+<h3>개선 목표 (운영 원칙)</h3>
+<ul>
+<li><b>단순 Simple</b> – 한 번 입력해 여러 단계 활용</li>
+<li><b>일정 Steady</b> – 서식·문체 기준 통일</li>
+<li><b>연결 Connected</b> – 공지→출석→보고 흐름 유지</li>
+</ul>
  </div>
 </div>
 <div class="tip reveal" style="margin-top:12px">
@@ -570,34 +606,37 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Overview</span>
+<span class="section-tag-dot"></span>
+<span>Overview</span>
 </div>
 <h2 class="reveal">이번에 직접 개선한 3가지</h2>
+<div class="keyline reveal">
+오늘 데모는 <b>“메일 템플릿 · 안내 사이트 · PIN 출석”</b>, 세 가지 개선 흐름으로 보시면 됩니다.
+</div>
 <div class="grid-3 stagger">
  <div class="card">
-   <h3>① HTML 템플릿 (메일·인쇄)</h3>
-   <ul>
-     <li>공지 메일·인쇄물을 <b>단일 HTML</b> 템플릿으로 생성</li>
-     <li>Outlook·EP 메일 호환, 레이아웃 깨짐 최소화</li>
-     <li>운영 원칙: <b>단순 · 일정</b></li>
-   </ul>
+<h3>① HTML 템플릿 (메일·인쇄)</h3>
+<ul>
+<li>공지 메일·인쇄물을 <b>단일 HTML</b> 템플릿으로 생성</li>
+<li>Outlook·EP 메일 호환, 레이아웃 깨짐 최소화</li>
+<li>운영 원칙: <b>단순 · 일정</b></li>
+</ul>
  </div>
  <div class="card">
-   <h3>② 개강 안내 사이트</h3>
-   <ul>
-     <li>기존 안내문을 <b>웹 페이지</b>로 전환</li>
-     <li>외부 강사·내부 구성원이 같은 화면 기준 사용</li>
-     <li>운영 원칙: <b>일정 · 연결</b></li>
-   </ul>
+<h3>② 개강 안내 사이트</h3>
+<ul>
+<li>기존 안내문을 <b>웹 페이지</b>로 전환</li>
+<li>외부 강사·내부 구성원이 같은 화면 기준 사용</li>
+<li>운영 원칙: <b>일정 · 연결</b></li>
+</ul>
  </div>
  <div class="card">
-   <h3>③ PIN 기반 세미나 출석</h3>
-   <ul>
-     <li>Class별 PIN 코드로 공용 PC에서 출석 입력</li>
-     <li>MS 연동으로 출석 시간·명단 자동 기록</li>
-     <li>운영 원칙: <b>단순 · 연결</b></li>
-   </ul>
+<h3>③ PIN 기반 세미나 출석</h3>
+<ul>
+<li>Class별 PIN 코드로 공용 PC에서 출석 입력</li>
+<li>MS 연동으로 출석 시간·명단 자동 기록</li>
+<li>운영 원칙: <b>단순 · 연결</b></li>
+</ul>
  </div>
 </div>
 <p class="small reveal" style="margin-top:8px">
@@ -612,35 +651,38 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Demo 1 · HTML Template</span>
+<span class="section-tag-dot"></span>
+<span>Demo 1 · HTML Template</span>
 </div>
 <h2 class="reveal">개선 1 – HTML 템플릿 (메일·인쇄)</h2>
+<div class="keyline reveal">
+<b>“메일·인쇄물은 템플릿 1종으로 통일”</b> → 작성 시간은 줄이고, 품질은 일정하게.
+</div>
 <div class="grid-2">
  <div class="card reveal">
-   <h3>Before · 수기 메일·이미지</h3>
-   <ul>
-     <li>과정마다 Word/PowerPoint 양식을 새로 작성</li>
-     <li>EP·Outlook에서 이미지·줄바꿈 깨짐</li>
-     <li>작성+검수 포함 1건당 약 35분 소요</li>
-   </ul>
-   <div class="risk" style="margin-top:8px">
-     담당자·과정이 바뀔 때마다 <b>처음부터 다시 만드는 느낌</b>이 반복되었습니다.
-   </div>
+<h3>Before · 수기 메일·이미지</h3>
+<ul>
+<li>과정마다 Word/PowerPoint 양식을 새로 작성</li>
+<li>EP·Outlook에서 이미지·줄바꿈 깨짐</li>
+<li>작성+검수 포함 1건당 약 35분 소요</li>
+</ul>
+<div class="risk" style="margin-top:8px">
+담당자·과정이 바뀔 때마다 <b>처음부터 다시 만드는 느낌</b>이 반복되었습니다.
+</div>
  </div>
  <div class="card reveal">
-   <h3>After · HTML 템플릿 1종 통일</h3>
-   <div class="mock">
-     <img src="images/mail_template_sample.png" alt="HTML 메일 템플릿 예시">
-   </div>
-   <ul style="margin-top:8px">
-     <li>과정명·일시만 입력하면 안내문이 <b>자동 생성</b></li>
-     <li>버튼·색상·폰트 통일 → 운영 품질 일정화</li>
-     <li>제작 시간 약 7분, 약 80% 단축</li>
-   </ul>
-   <p class="small">
-     ※ 이미지는 <code>images/mail_template_sample.png</code>를 실제 캡처로 교체해 사용.
-   </p>
+<h3>After · HTML 템플릿 1종 통일</h3>
+<div class="mock">
+<img src="images/mail_template_sample.png" alt="HTML 메일 템플릿 예시">
+</div>
+<ul style="margin-top:8px">
+<li>과정명·일시만 입력하면 안내문이 <b>자동 생성</b></li>
+<li>버튼·색상·폰트 통일 → 운영 품질 일정화</li>
+<li>제작 시간 약 7분, 약 80% 단축</li>
+</ul>
+<p class="small">
+※ 이미지는 <code>images/mail_template_sample.png</code>를 실제 캡처로 교체해 사용.
+</p>
  </div>
 </div>
 </div>
@@ -652,38 +694,41 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Demo 2 · Opening Site</span>
+<span class="section-tag-dot"></span>
+<span>Demo 2 · Opening Site</span>
 </div>
 <h2 class="reveal">개선 2 – 개강 안내 사이트</h2>
+<div class="keyline reveal">
+<b>핵심 안내는 “메일 + 웹 한 페이지”로</b> → 강사·교육생 모두 같은 화면을 봅니다.
+</div>
 <div class="grid-2">
  <div class="card reveal">
-   <h3>역할</h3>
-   <ul>
-     <li>Magok Lecture Guide 등 방문·개강 정보를 한 화면에 정리</li>
-     <li>외부 강사·내부 구성원이 동일한 정보 기준 사용</li>
-     <li>메일 안내문에서 <b>링크 한 번</b>으로 바로 접속</li>
-   </ul>
-   <div class="note" style="margin-top:8px">
-     데모에서는 <b>개강 안내 사이트만</b> 브라우저 링크로 직접 접속해 보여드립니다.
-   </div>
-   <p class="small" style="margin-top:6px">
-     (운영 URL 예시)&nbsp;
-     <a class="en" href="https://example.com/magok-lecture-guide" target="_blank">
-       https://example.com/magok-lecture-guide
-     </a><br>
-     ※ 발표 전 실제 사내 URL로 교체.
-   </p>
+<h3>역할</h3>
+<ul>
+<li>Magok Lecture Guide 등 방문·개강 정보를 한 화면에 정리</li>
+<li>외부 강사·내부 구성원이 동일한 정보 기준 사용</li>
+<li>메일 안내문에서 <b>링크 한 번</b>으로 바로 접속</li>
+</ul>
+<div class="note" style="margin-top:8px">
+데모에서는 <b>개강 안내 사이트만</b> 브라우저 링크로 직접 접속해 보여드립니다.
+</div>
+<p class="small" style="margin-top:6px">
+(운영 URL 예시)&nbsp;
+<a class="en" href="https://example.com/magok-lecture-guide" target="_blank">
+https://example.com/magok-lecture-guide
+</a><br>
+※ 발표 전 실제 사내 URL로 교체.
+</p>
  </div>
  <div class="card reveal">
-   <h3>화면 예시</h3>
-   <div class="mock">
-     <img src="images/lecture_guide_sample.png" alt="개강 안내 사이트 예시">
-   </div>
-   <p class="small">
-     방문 절차, 주차, 출입 등을 <b>한 페이지</b>로 통합해  
-     “메일 + 웹” 조합으로 안내합니다.
-   </p>
+<h3>화면 예시</h3>
+<div class="mock">
+<img src="images/lecture_guide_sample.png" alt="개강 안내 사이트 예시">
+</div>
+<p class="small">
+방문 절차, 주차, 출입 등을 <b>한 페이지</b>로 통합해 
+“메일 + 웹” 조합으로 안내합니다.
+</p>
  </div>
 </div>
 </div>
@@ -695,34 +740,37 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Demo 3 · Attendance</span>
+<span class="section-tag-dot"></span>
+<span>Demo 3 · Attendance</span>
 </div>
 <h2 class="reveal">개선 3 – 세미나 출석 흐름</h2>
+<div class="keyline reveal">
+<b>종이 서명 대신 “PIN + 자동 기록”</b> → 출석 누락과 수기 정리를 한 번에 줄였습니다.
+</div>
 <div class="grid-3 stagger">
  <div class="card">
-   <h3>Before · 종이 출석</h3>
-   <ul>
-     <li>종이에 서명, 필기체·누락으로 재확인 필요</li>
-     <li>명단과 수기로 대조하며 인원 체크</li>
-     <li>출석 정리·입력에 추가 공수 발생</li>
-   </ul>
+<h3>Before · 종이 출석</h3>
+<ul>
+<li>종이에 서명, 필기체·누락으로 재확인 필요</li>
+<li>명단과 수기로 대조하며 인원 체크</li>
+<li>출석 정리·입력에 추가 공수 발생</li>
+</ul>
  </div>
  <div class="card">
-   <h3>After · PIN 출석</h3>
-   <ul>
-     <li>Class별 PIN을 공용 PC에서 입력</li>
-     <li>MS 연동으로 출석 시간·명단 자동 기록</li>
-     <li>출석 누락 0건, 수기 정리 공수 감소</li>
-   </ul>
+<h3>After · PIN 출석</h3>
+<ul>
+<li>Class별 PIN을 공용 PC에서 입력</li>
+<li>MS 연동으로 출석 시간·명단 자동 기록</li>
+<li>출석 누락 0건, 수기 정리 공수 감소</li>
+</ul>
  </div>
  <div class="card">
-   <h3>시연 방식</h3>
-   <ul>
-     <li>실제 운영 화면을 공용 PC 2대로 녹화</li>
-     <li>발표 시에는 링크 접속 없이 <b>영상</b>으로 흐름 시연</li>
-     <li>“이전 불편 → 개선 화면”이 한눈에 보이도록 구성</li>
-   </ul>
+<h3>시연 방식</h3>
+<ul>
+<li>실제 운영 화면을 공용 PC 2대로 녹화</li>
+<li>발표 시에는 링크 접속 없이 <b>영상</b>으로 흐름 시연</li>
+<li>“이전 불편 → 개선 화면”이 한눈에 보이도록 구성</li>
+</ul>
  </div>
 </div>
 <div class="tip reveal" style="margin-top:12px">
@@ -737,10 +785,13 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Structure</span>
+<span class="section-tag-dot"></span>
+<span>Structure</span>
 </div>
 <h2 class="reveal">토큰 & CSV 기반 구조</h2>
+<div class="keyline reveal">
+<b>“한 번만 정확히 입력하고, 나머지는 코드가 대신”</b>하는 구조로 바꿨습니다.
+</div>
 <table class="table reveal">
  <tr><th>토큰</th><th>설명</th><th>예시</th><th>규칙</th></tr>
  <tr><td>{과정명}</td><td>교육 명칭</td><td>SW Security 101</td><td>고정 명칭</td></tr>
@@ -764,16 +815,19 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Impact</span>
+<span class="section-tag-dot"></span>
+<span>Impact</span>
 </div>
 <h2 class="reveal">성과 요약</h2>
+<div class="keyline reveal">
+핵심은 <b>“시간 80% 절감 + 오류 0건”</b>, 그리고 교육 경험의 체감 품질 상승입니다.
+</div>
 <table class="table reveal">
 <tr><th>항목</th><th>Before</th><th>After</th><th>변화</th></tr>
-<tr><td>제작 시간</td><td>35분</td><td>7분</td><td>-80%</td></tr>
-<tr><td>서식 오류</td><td>월 7건</td><td>0건</td><td>해결</td></tr>
+<tr><td>제작 시간</td><td>35분</td><td><b>7분</b></td><td><b>-80%</b></td></tr>
+<tr><td>서식 오류</td><td>월 7건</td><td><b>0건</b></td><td>해결</td></tr>
 <tr><td>문의</td><td>주 10건</td><td>7건</td><td>-30%</td></tr>
-<tr><td>만족도</td><td>68점</td><td>93점</td><td>+25pt</td></tr>
+<tr><td>만족도</td><td>68점</td><td><b>93점</b></td><td>+25pt</td></tr>
 </table>
 <div class="grid-3" style="margin-top:12px">
  <div class="card"><h3>운영자</h3><p>반복 작업 ↓, 기획·소통에 쓰는 시간 ↑</p></div>
@@ -789,26 +843,29 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Extension</span>
+<span class="section-tag-dot"></span>
+<span>Extension</span>
 </div>
 <h2 class="reveal">기능 활용성</h2>
+<div class="keyline reveal">
+<b>“새 시스템 도입”이 아니라,</b> 지금 있는 문서·코드를 <b>같이 쓰기 좋게 정리한 것</b>에 가깝습니다.
+</div>
 <div class="grid-2b stagger">
  <div class="card">
-   <h3>조직별 활용 방안</h3>
-   <ul>
-     <li>공통 템플릿 세트 → 본부별 맞춤 수정</li>
-     <li>Teams 채널로 HTML 코드·샘플·Tip 공유</li>
-     <li>정기 공지/보고 일정 알림 + 양식 링크 제공</li>
-   </ul>
+<h3>조직별 활용 방안</h3>
+<ul>
+<li>공통 템플릿 세트 → 본부별 맞춤 수정</li>
+<li>Teams 채널로 HTML 코드·샘플·Tip 공유</li>
+<li>정기 공지/보고 일정 알림 + 양식 링크 제공</li>
+</ul>
  </div>
  <div class="card">
-   <h3>협업 부서</h3>
-   <ul>
-     <li>기획팀: 보고 항목·지표 정의</li>
-     <li>HRD: 일정표·출석 절차 개선</li>
-     <li>인재육성: 양식 통합 제안 및 사내 확산</li>
-   </ul>
+<h3>협업 부서</h3>
+<ul>
+<li>기획팀: 보고 항목·지표 정의</li>
+<li>HRD: 일정표·출석 절차 개선</li>
+<li>인재육성: 양식 통합 제안 및 사내 확산</li>
+</ul>
  </div>
 </div>
 <div class="tip reveal" style="margin-top:12px">
@@ -823,39 +880,42 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Next Step</span>
+<span class="section-tag-dot"></span>
+<span>Next Step</span>
 </div>
 <h2 class="reveal">향후 계획</h2>
+<div class="keyline reveal">
+파일럿에서 끝이 아니라, <b>“세미나 출결 · 안내 사이트” 두 축으로 계속 확장</b>해 볼 계획입니다.
+</div>
 <table class="table reveal">
  <tr><th>현재 구현</th><th>향후 디벨롭 방향</th></tr>
  <tr>
-   <td>PIN 기반 출석 사이트</td>
-   <td>
-     MS 계정 연동으로 출석 기록 자동화 안정화<br>
-     타 조직도 활용할 수 있도록 운영 매뉴얼·예시 화면 정리
-   </td>
+<td>PIN 기반 출석 사이트</td>
+<td>
+MS 계정 연동으로 출석 기록 자동화 안정화<br>
+타 조직도 활용할 수 있도록 운영 매뉴얼·예시 화면 정리
+</td>
  </tr>
  <tr>
-   <td>외부 강사 정보 입력 + Email 자동 메일링</td>
-   <td>
-     MS 환경과 연동해 데이터 자동 축적 보완<br>
-     다른 교육에서도 바로 쓸 수 있는 <b>정형 템플릿</b>으로 배포
-   </td>
+<td>외부 강사 정보 입력 + Email 자동 메일링</td>
+<td>
+MS 환경과 연동해 데이터 자동 축적 보완<br>
+다른 교육에서도 바로 쓸 수 있는 <b>정형 템플릿</b>으로 배포
+</td>
  </tr>
  <tr>
-   <td>HTML 메일 템플릿</td>
-   <td>
-     HTML 활용 스터디 진행<br>
-     다수가 직접 수정·재사용할 수 있도록 사례 공유
-   </td>
+<td>HTML 메일 템플릿</td>
+<td>
+HTML 활용 스터디 진행<br>
+다수가 직접 수정·재사용할 수 있도록 사례 공유
+</td>
  </tr>
  <tr>
-   <td>CSV 업로드 기반 명단 생성</td>
-   <td>
-     실시간 데이터 분석 → 보고 자동화·시각화 샘플 생성<br>
-     반복 보고 포맷을 HTML/Excel 템플릿으로 정리
-   </td>
+<td>CSV 업로드 기반 명단 생성</td>
+<td>
+실시간 데이터 분석 → 보고 자동화·시각화 샘플 생성<br>
+반복 보고 포맷을 HTML/Excel 템플릿으로 정리
+</td>
  </tr>
 </table>
 <div class="note reveal" style="margin-top:10px">
@@ -873,35 +933,38 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>How-to · AI</span>
+<span class="section-tag-dot"></span>
+<span>How-to · AI</span>
 </div>
 <h2 class="reveal">프롬프트 & 코파일럿 활용 팁</h2>
+<div class="keyline reveal">
+AI는 <b>“완성품”이 아니라 “초안 + 검수 보조”</b>로 쓸 때, 운영 품질이 가장 안전했습니다.
+</div>
 <div class="grid-2b stagger">
  <div class="card">
-   <h3>프롬프트 작성 3원칙</h3>
-   <ul>
-     <li><b>맥락 먼저</b> – “교육 안내 메일 초안, 대상: 내부 임직원”</li>
-     <li><b>형식 지정</b> – 제목/본문/버튼 문구 등 명확히 요청</li>
-     <li><b>제한 조건</b> – 분량, 톤(존댓말), 금지 단어 등 명시</li>
-   </ul>
-   <p class="small">
-     예) “SW 보안 세미나 개강 안내 메일 초안 써줘.  
-     대상은 사내 개발자, 존댓말, 10줄 이내,  
-     일정/장소/문의처는 {토큰}으로 남겨줘.”
-   </p>
+<h3>프롬프트 작성 3원칙</h3>
+<ul>
+<li><b>맥락 먼저</b> – “교육 안내 메일 초안, 대상: 내부 임직원”</li>
+<li><b>형식 지정</b> – 제목/본문/버튼 문구 등 명확히 요청</li>
+<li><b>제한 조건</b> – 분량, 톤(존댓말), 금지 단어 등 명시</li>
+</ul>
+<p class="small">
+예) “SW 보안 세미나 개강 안내 메일 초안 써줘. 
+대상은 사내 개발자, 존댓말, 10줄 이내, 
+일정/장소/문의처는 {토큰}으로 남겨줘.”
+</p>
  </div>
  <div class="card">
-   <h3>코파일럿 활용 예시</h3>
-   <ul>
-     <li>HTML 코드 구조 점검·정리</li>
-     <li>반복 문구를 <b>토큰</b> 형태로 분리할 때 아이디어 받기</li>
-     <li>Outlook/Forms에서 깨지는 부분 원인 확인</li>
-   </ul>
-   <div class="tip" style="margin-top:8px">
-     “완성품 제작”이 아니라,<br>
-     <b>초안 생성 + 검수 보조</b> 역할로 사용하고 있습니다.
-   </div>
+<h3>코파일럿 활용 예시</h3>
+<ul>
+<li>HTML 코드 구조 점검·정리</li>
+<li>반복 문구를 <b>토큰</b> 형태로 분리할 때 아이디어 받기</li>
+<li>Outlook/Forms에서 깨지는 부분 원인 확인</li>
+</ul>
+<div class="tip" style="margin-top:8px">
+“완성품 제작”이 아니라,<br>
+<b>초안 생성 + 검수 보조</b> 역할로 사용하고 있습니다.
+</div>
  </div>
 </div>
 </div>
@@ -913,35 +976,35 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>FAQ</span>
+<span class="section-tag-dot"></span>
+<span>FAQ</span>
 </div>
 <h2 class="reveal">FAQ</h2>
 <div class="grid-2b stagger">
  <div class="card">
-   <h3>Q1. 코드를 몰라도 쓸 수 있나요?</h3>
-   <p>
-     A. 네. 기본 구조는 제가 세팅해 두고,  
-     운영자는 <b>토큰 값(과정명/일시/장소)</b>만 입력하면 됩니다.
-   </p>
-   <h3 style="margin-top:12px">Q2. 오류 나면 어떻게 하나요?</h3>
-   <p>
-     A. 토큰 누락·오타는 발송 전 자동 체크하고,  
-     템플릿 원본은 Teams에 보관해 <b>바로 롤백</b>이 가능합니다.
-   </p>
+<h3>Q1. 코드를 몰라도 쓸 수 있나요?</h3>
+<p>
+A. 네. 기본 구조는 제가 세팅해 두고, 
+운영자는 <b>토큰 값(과정명/일시/장소)</b>만 입력하면 됩니다.
+</p>
+<h3 style="margin-top:12px">Q2. 오류 나면 어떻게 하나요?</h3>
+<p>
+A. 토큰 누락·오타는 발송 전 자동 체크하고, 
+템플릿 원본은 Teams에 보관해 <b>바로 롤백</b>이 가능합니다.
+</p>
  </div>
  <div class="card">
-   <h3>Q3. 다른 본부에서도 바로 쓸 수 있나요?</h3>
-   <p>
-     A. 과목·브랜드만 바꾸면 되도록 설계했습니다.  
-     필요 시 교육운영팀에서 <b>초기 세팅</b> 지원이 가능합니다.
-   </p>
-   <h3 style="margin-top:12px">Q4. 유지보수 부담은?</h3>
-   <p>
-     A. 외부 시스템이 아니라,  
-     <b>MS365 + HTML 코드</b> 수준이라 비교적 가볍습니다.  
-     템플릿을 한 번 수정하면 전체에 반영됩니다.
-   </p>
+<h3>Q3. 다른 본부에서도 바로 쓸 수 있나요?</h3>
+<p>
+A. 과목·브랜드만 바꾸면 되도록 설계했습니다. 
+필요 시 교육운영팀에서 <b>초기 세팅</b> 지원이 가능합니다.
+</p>
+<h3 style="margin-top:12px">Q4. 유지보수 부담은?</h3>
+<p>
+A. 외부 시스템이 아니라, 
+<b>MS365 + HTML 코드</b> 수준이라 비교적 가볍습니다. 
+템플릿을 한 번 수정하면 전체에 반영됩니다.
+</p>
  </div>
 </div>
 </div>
@@ -953,22 +1016,25 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <div class="section-tag reveal">
-  <span class="section-tag-dot"></span>
-  <span>Summary</span>
+<span class="section-tag-dot"></span>
+<span>Summary</span>
 </div>
 <h2 class="reveal">결론</h2>
 <p class="sub reveal">
 <b>운영의 품질 = 경험의 품질</b><br>
 작은 정리가 현장의 체감을 크게 바꿉니다.
 </p>
+<div class="keyline reveal">
+이번 파일럿의 결론은, <b>“반복되는 운영을 코드와 템플릿으로 정리하면 모두가 편해진다”</b> 입니다.
+</div>
 <div class="note reveal" style="margin-top:14px">
  <ol style="margin-left:16px; font-size:15px; line-height:1.8">
-   <b>실행 포인트</b>
+<b>실행 포인트</b>
  </ol>
  <ol style="margin-left:16px; font-size:13px; line-height:1.8">
-   <li>반복 업무를 줄이고, 표준 템플릿을 제공한다.</li>
-   <li>사내 도구와 간단한 코드로 누구나 쓸 수 있게 만든다.</li>
-   <li>업무 개선 경험을 팀 단위로 공유·확산한다.</li>
+<li>반복 업무를 줄이고, 표준 템플릿을 제공한다.</li>
+<li>사내 도구와 간단한 코드로 누구나 쓸 수 있게 만든다.</li>
+<li>업무 개선 경험을 팀 단위로 공유·확산한다.</li>
  </ol>
 </div>
 <p class="small reveal" style="margin-top:8px">팀 단위로 차근차근 확산을 시도해 보겠습니다.</p>
@@ -981,18 +1047,18 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <div class="topbar"></div>
 <div class="inner">
 <h2 class="reveal thanks-title">
-         경청해 주셔서 감사합니다
+경청해 주셔서 감사합니다
 <span class="thanks-underline" aria-hidden="true"></span>
 </h2>
 <p class="sub reveal">
-         Simple · Steady · Connected — 작지만 꾸준한 정리가 교육 경험의 품질을 만든다고 생각합니다.
+Simple · Steady · Connected — 작지만 꾸준한 정리가 교육 경험의 품질을 만든다고 생각합니다.
 </p>
 <div class="tip reveal" style="margin-top:18px">
-         오늘 공유드린 흐름을 바탕으로,<br>
-         교육운영팀에서 더 많이 정리하고, 더 편하게 운영해 보겠습니다. 😊
+오늘 공유드린 흐름을 바탕으로,<br>
+교육운영팀에서 더 많이 정리하고, 더 편하게 운영해 보겠습니다. 😊
 </div>
 <p class="small reveal" style="margin-top:14px">
-         교육운영파트 김미진 드림
+교육운영파트 김미진 드림
 </p>
 </div>
 <div class="sno">15</div>
@@ -1003,19 +1069,19 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <!-- Controls -->
 <div class="controls" aria-hidden="false">
  <div class="navbtns">
-   <button class="ctrl" id="prevBtn" aria-label="이전 슬라이드">← 이전</button>
-   <button class="ctrl" id="nextBtn" aria-label="다음 슬라이드">다음 →</button>
+<button class="ctrl" id="prevBtn" aria-label="이전 슬라이드">← 이전</button>
+<button class="ctrl" id="nextBtn" aria-label="다음 슬라이드">다음 →</button>
  </div>
  <div class="dots" id="dots" aria-label="슬라이드 이동 도트"></div>
 </div>
 
 <div class="html-pill">
-  <span class="code">&lt;/&gt;</span>
-  <span class="label">HTML CODE DEMO</span>
+<span class="code">&lt;/&gt;</span>
+<span class="label">HTML CODE DEMO</span>
 </div>
 
 <div class="hint">
-  ← / → 또는 클릭으로 슬라이드 이동
+← / → 또는 클릭으로 슬라이드 이동
 </div>
 
 </div>
@@ -1023,87 +1089,87 @@ hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
 <script>
 /* 로고 자동 삽입 */
 (function(){
- const logoSrc = 'https://raw.githubusercontent.com/Edulorix/any/main/발표장료/biztechon_logo.png';
- document.querySelectorAll('.slide').forEach(slide=>{
-   if(slide.querySelector('.logo-biztechon')) return;
-   const img=document.createElement('img');
-   img.src=logoSrc;
-   img.alt='BizTechON';
-   img.className='logo-biztechon';
-   slide.appendChild(img);
- });
+const logoSrc = 'https://raw.githubusercontent.com/Edulorix/any/main/발표장료/biztechon_logo.png';
+document.querySelectorAll('.slide').forEach(slide=>{
+if(slide.querySelector('.logo-biztechon')) return;
+const img=document.createElement('img');
+img.src=logoSrc;
+img.alt='BizTechON';
+img.className='logo-biztechon';
+slide.appendChild(img);
+});
 })();
 
 /* 슬라이드 내비 & 애니메이션 */
 (function(){
- const deck = document.getElementById('deck');
- const slides = Array.from(document.querySelectorAll('.slide'));
- const total = slides.length;
- let current = 0;
+const deck = document.getElementById('deck');
+const slides = Array.from(document.querySelectorAll('.slide'));
+const total = slides.length;
+let current = 0;
 
- const dotsWrap = document.getElementById('dots');
- const progressInner = document.getElementById('progressInner');
+const dotsWrap = document.getElementById('dots');
+const progressInner = document.getElementById('progressInner');
 
- const dots = slides.map((_,i)=>{
-   const d=document.createElement('div');
-   d.className='dot'; d.dataset.i=i;
-   d.addEventListener('click', ()=>show(i));
-   dotsWrap.appendChild(d);
-   return d;
- });
+const dots = slides.map((_,i)=>{
+const d=document.createElement('div');
+d.className='dot'; d.dataset.i=i;
+d.addEventListener('click', ()=>show(i));
+dotsWrap.appendChild(d);
+return d;
+});
 
- function updateDots(){
-   dots.forEach((d,i)=>d.classList.toggle('active', i===current));
- }
+function updateDots(){
+dots.forEach((d,i)=>d.classList.toggle('active', i===current));
+}
 
- function updateProgress(){
-   if(!progressInner) return;
-   const ratio = (current+1)/total;
-   progressInner.style.width = (ratio*100) + '%';
- }
+function updateProgress(){
+if(!progressInner) return;
+const ratio = (current+1)/total;
+progressInner.style.width = (ratio*100) + '%';
+}
 
- function playReveal(slideEl){
-   slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.remove('show'));
-   slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.remove('show'));
-   requestAnimationFrame(()=>{
-     requestAnimationFrame(()=>{
-       slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.add('show'));
-       slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.add('show'));
-     });
-   });
- }
+function playReveal(slideEl){
+slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.remove('show'));
+slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.remove('show'));
+requestAnimationFrame(()=>{
+requestAnimationFrame(()=>{
+slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.add('show'));
+slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.add('show'));
+});
+});
+}
 
- function show(idx){
-   if(idx<0) idx=0;
-   if(idx>=total) idx=total-1;
-   current = idx;
-   deck.style.transform = `translateX(-${idx*100}%)`;
-   updateDots();
-   updateProgress();
-   setTimeout(()=> playReveal(slides[idx]), 60);
- }
+function show(idx){
+if(idx<0) idx=0;
+if(idx>=total) idx=total-1;
+current = idx;
+deck.style.transform = `translateX(-${idx*100}%)`;
+updateDots();
+updateProgress();
+setTimeout(()=> playReveal(slides[idx]), 60);
+}
 
- document.getElementById('nextBtn').addEventListener('click', ()=>show(current+1));
- document.getElementById('prevBtn').addEventListener('click', ()=>show(current-1));
+document.getElementById('nextBtn').addEventListener('click', ()=>show(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=>show(current-1));
 
- document.addEventListener('keydown', (e)=>{
-   if(e.key==='ArrowRight') show(current+1);
-   if(e.key==='ArrowLeft')  show(current-1);
- });
+document.addEventListener('keydown', (e)=>{
+if(e.key==='ArrowRight') show(current+1);
+if(e.key==='ArrowLeft') show(current-1);
+});
 
- let startX=null;
- deck.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }, {passive:true});
- deck.addEventListener('touchend', (e)=>{
-   if(startX===null) return;
-   const dx = e.changedTouches[0].clientX - startX;
-   if(Math.abs(dx)>50){
-     if(dx<0) show(current+1);
-     else show(current-1);
-   }
-   startX=null;
- }, {passive:true});
+let startX=null;
+deck.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }, {passive:true});
+deck.addEventListener('touchend', (e)=>{
+if(startX===null) return;
+const dx = e.changedTouches[0].clientX - startX;
+if(Math.abs(dx)>50){
+if(dx<0) show(current+1);
+else show(current-1);
+}
+startX=null;
+}, {passive:true});
 
- show(0);
+show(0);
 })();
 </script>
 </body>
