@@ -852,6 +852,23 @@ h3{
   .attend-admin-backdrop,
   .nav-floating{display:none!important;}
 }
+/* 커버(1페이지) 전용 규격 */
+.slide-cover .cover-main{
+  justify-content:flex-start;     /* 위쪽 정렬 */
+  max-width:720px;               /* 본문 폭 고정 */
+  margin:40px auto 0;            /* 가운데 정렬 + 위 여백 */
+}
+
+.slide-cover .cover-title{
+  font-size:34px;                /* 첫 장표만 살짝 크게 */
+  line-height:1.25;
+}
+
+.slide-cover .cover-sub{
+  margin-top:10px;
+  font-size:14px;
+}
+
 </style>
 </head>
 <body>
@@ -863,7 +880,7 @@ h3{
     </div>
 
     <!-- 1. 표지 (제목 고정) -->
-    <section class="slide active">
+    <section class="slide slide-cover active">
       <div class="slide-header-top">
         <div class="brand">
           <img src="biztechon.logo.png" alt="BizTechON" class="brand-logo">
