@@ -1,1659 +1,4289 @@
 <!doctype html>
+
 <html lang="ko">
+
 <head>
+
 <meta charset="utf-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>AI로 구현한 스마트 교육운영 (Demo)</title>
+
 <style>
+
 :root{
-/* 컬러 – 화이트 베이스 + 살짝 럭셔리 포인트 */
---bg:#F4F5F7;
---bg2:#FFFFFF;
---panel:#FFFFFF;
---panel-soft:#F9FAFB;
---surface:#FFFFFF;
---ink:#111827;
---muted:#6B7280;
---line:#E5E7EB;
---accent:#0EA5E9;
---accent-soft:#DBF4FF;
---primary:#A50034;
---accent2:#6366F1;
---ok:#16A34A;
---warn:#EA580C;
---info:#0EA5E9;
---radius:20px;
---radius-lg:26px;
---shadow-lg:0 22px 55px rgba(15,23,42,0.16);
+
+  --bg:#F3F4F6;
+
+  --surface:#FFFFFF;
+
+  --border:#E5E7EB;
+
+  --border-strong:#D1D5DB;
+
+  --ink:#111827;
+
+  --muted:#6B7280;
+
+  --accent:#0EA5E9;
+
+  --accent-soft:#E0F2FE;
+
+  --primary:#A50034;
+
+  --primary-soft:#FDF2F7;
+
+  --ok:#16A34A;
+
+  --warn:#EA580C;
+
+  --info:#0EA5E9;
+
+  --radius:12px;
+
 }
+
+
 
 /* 기본 타이포 */
+
 html,body{
-margin:0; padding:0;
-background:var(--bg);
-color:var(--ink);
-font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
--webkit-font-smoothing:antialiased;
-letter-spacing:.01em;
-line-height:1.6;
-}
-[lang="en"], .en{
-font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
-letter-spacing:.02em;
+
+  margin:0;
+
+  padding:0;
+
+  background:var(--bg);
+
+  color:var(--ink);
+
+  font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+  -webkit-font-smoothing:antialiased;
+
+  letter-spacing:.01em;
+
+  line-height:1.6;
+
 }
 
-/* 뷰포트/덱 */
-.viewport{
-width:100vw; height:100vh;
-overflow:hidden;
-position:relative;
-background:
-radial-gradient(circle at 0% 0%,rgba(148,163,184,0.25) 0,transparent 45%),
-radial-gradient(circle at 100% 100%,rgba(209,213,219,0.28) 0,transparent 50%),
-var(--bg);
+[lang="en"],.en{
+
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+
 }
+
+
+
+/* 앱 프레임 */
+
+.app-shell{
+
+  width:100vw;
+
+  height:100vh;
+
+  display:flex;
+
+  flex-direction:column;
+
+}
+
+
+
+/* 상단 헤더 */
+
+.app-header{
+
+  flex:0 0 auto;
+
+  background:var(--surface);
+
+  border-bottom:1px solid var(--border);
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  padding:8px 32px;
+
+  box-sizing:border-box;
+
+}
+
+.header-left{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+}
+
+.header-logo{
+
+  height:32px;
+
+  width:auto;
+
+}
+
+.header-title-wrap{
+
+  display:flex;
+
+  flex-direction:column;
+
+}
+
+.header-title{
+
+  font-size:15px;
+
+  font-weight:700;
+
+  letter-spacing:-0.02em;
+
+}
+
+.header-sub{
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+.header-right{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:14px;
+
+  font-size:12px;
+
+  color:var(--muted);
+
+}
+
+.header-tag{
+
+  padding:3px 9px;
+
+  border-radius:999px;
+
+  border:1px solid #D1D5DB;
+
+  font-size:11px;
+
+}
+
+.header-page{
+
+  font-variant-numeric:tabular-nums;
+
+}
+
+.header-section{
+
+  font-size:11px;
+
+  color:#4B5563;
+
+}
+
+
+
+/* 진행률 */
+
+.progress-bar{
+
+  flex:0 0 auto;
+
+  padding:6px 32px 4px;
+
+  box-sizing:border-box;
+
+  background:var(--surface);
+
+  border-bottom:1px solid var(--border);
+
+}
+
+.progress{
+
+  width:260px;
+
+  max-width:100%;
+
+  height:4px;
+
+  border-radius:999px;
+
+  background:#E5E7EB;
+
+  overflow:hidden;
+
+}
+
+.progress-inner{
+
+  width:0;
+
+  height:100%;
+
+  border-radius:inherit;
+
+  background:linear-gradient(90deg,#22C55E,#0EA5E9,#A855F7,#A50034);
+
+  transition:width .35s ease;
+
+}
+
+
+
+/* 메인 데크 영역 */
+
+.deck-wrapper{
+
+  flex:1 1 auto;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  padding:18px 24px 10px;
+
+  box-sizing:border-box;
+
+}
+
 .deck{
-display:flex; flex-direction:row; height:100%;
-transform:translateX(0); transition:transform .8s cubic-bezier(.22,.8,.22,1);
-will-change:transform;
+
+  width:100%;
+
+  max-width:1240px;
+
+  background:var(--surface);
+
+  border-radius:18px;
+
+  border:1px solid var(--border);
+
+  box-shadow:0 16px 40px rgba(15,23,42,.10);
+
+  overflow:hidden;
+
+  display:flex;
+
+  flex-direction:row;
+
 }
 
-/* 슬라이드 */
+
+
+/* 공통 슬라이드 */
+
 .slide{
-min-width:100%; height:100%;
-padding:40px 0;
-box-sizing:border-box;
-position:relative; overflow:hidden;
-display:flex; flex-direction:column; justify-content:center; align-items:center;
-}
-.slide::before{
-content:"";
-position:absolute; inset:18px 22px;
-border-radius:32px;
-background:
-radial-gradient(circle at 0 0,rgba(255,255,255,0.9) 0,rgba(255,255,255,0.7) 28%,transparent 55%),
-radial-gradient(circle at 100% 100%,rgba(248,250,252,0.95) 0,rgba(241,245,249,0.7) 28%,transparent 60%);
-box-shadow:0 12px 40px rgba(148,163,184,0.3);
-opacity:.88;
-pointer-events:none;
-}
-.inner{
-position:relative;
-z-index:1;
-width:1250px;
-max-width:92vw;
-margin:0 auto;
-padding:26px 30px 24px;
-border-radius:28px;
-background:linear-gradient(145deg,#FFFFFF,#F9FAFB);
-box-shadow:var(--shadow-lg);
-border:1px solid rgba(148,163,184,0.18);
+
+  min-width:100%;
+
+  box-sizing:border-box;
+
+  padding:24px 28px 22px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  position:relative;
+
 }
 
-/* 상단 라인(슬라이드 리본) */
-.topbar{
-position:absolute;
-top:24px;
-left:50%;
-transform:translateX(-50%);
-width:220px;
-height:5px;
-border-radius:999px;
-background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
-box-shadow:
-0 0 0 1px rgba(255,255,255,0.9),
-0 4px 14px rgba(148,163,184,0.65);
-opacity:.9;
+.slide-inner{
+
+  display:flex;
+
+  flex-direction:column;
+
+  height:100%;
+
 }
 
-/* 페이지 번호 */
-.sno{
-position:absolute; right:40px; bottom:30px;
-font-size:11px; color:var(--muted);
-background:#FFFFFF;
-border:1px solid rgba(148,163,184,0.55);
-border-radius:999px;
-padding:6px 14px;
-box-shadow:0 10px 24px rgba(15,23,42,.18);
-z-index:2;
+
+
+/* 커버 슬라이드 – 매우 깔끔 */
+
+.slide--cover{
+
+  padding:18px 28px 26px;
+
 }
 
-/* 섹션 태그 */
+.slide--cover .slide-inner{
+
+  justify-content:center;
+
+  align-items:flex-start;
+
+}
+
+.cover-label{
+
+  font-size:11px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.16em;
+
+  color:var(--muted);
+
+  margin-bottom:20px;
+
+}
+
+.cover-title{
+
+  font-size:34px;
+
+  letter-spacing:-0.06em;
+
+  font-weight:800;
+
+  margin:0 0 12px;
+
+}
+
+.cover-sub{
+
+  font-size:15px;
+
+  color:#374151;
+
+  margin:0 0 18px;
+
+}
+
+.cover-meta{
+
+  font-size:12px;
+
+  color:var(--muted);
+
+}
+
+.cover-keyline{
+
+  margin-top:20px;
+
+  border-radius:var(--radius);
+
+  border:1px solid var(--border-strong);
+
+  background:#F9FAFB;
+
+  padding:10px 12px;
+
+  font-size:13px;
+
+}
+
+.cover-keyline b{color:var(--primary);}
+
+.cover-keyline span.label{
+
+  font-size:11px;
+
+  text-transform:uppercase;
+
+  letter-spacing:.14em;
+
+  color:var(--muted);
+
+  display:block;
+
+  margin-bottom:4px;
+
+}
+
+
+
+/* 일반 슬라이드 상단 라인 */
+
+.slide-topline{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:8px;
+
+  margin-bottom:10px;
+
+}
+
 .section-tag{
-display:inline-flex;
-align-items:center;
-gap:6px;
-padding:4px 11px;
-border-radius:999px;
-background:rgba(255,255,255,0.9);
-border:1px solid rgba(148,163,184,0.7);
-color:var(--muted);
-font-size:11px;
-text-transform:uppercase;
-letter-spacing:.12em;
-margin-bottom:10px;
-box-shadow:0 6px 18px rgba(148,163,184,0.35);
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:6px;
+
+  padding:3px 10px;
+
+  border-radius:999px;
+
+  border:1px solid #E5E7EB;
+
+  font-size:11px;
+
+  color:var(--muted);
+
+  text-transform:uppercase;
+
+  letter-spacing:.12em;
+
 }
+
 .section-tag-dot{
-width:7px;height:7px;border-radius:999px;
-background:radial-gradient(circle,#0EA5E9 0,#0369A1 36%,transparent 70%);
-box-shadow:0 0 8px rgba(14,165,233,0.85);
+
+  width:7px;
+
+  height:7px;
+
+  border-radius:999px;
+
+  background:var(--primary);
+
 }
 
-/* 타이포 */
-h1,h2,h3{margin:0 0 14px 0; line-height:1.18}
-h1{
-font-size:42px;
-font-weight:900;
-letter-spacing:-0.04em;
-margin-bottom:18px;
+.slide-meta{
+
+  font-size:11px;
+
+  color:var(--muted);
+
 }
+
+
+
+/* 일반 슬라이드 헤더 */
+
+.slide-header{
+
+  border-top:2px solid var(--primary);
+
+  padding-top:10px;
+
+  margin-bottom:10px;
+
+}
+
+h1,h2,h3{
+
+  margin:0 0 6px 0;
+
+  line-height:1.25;
+
+}
+
 h2{
-font-size:30px;
-font-weight:900;
-letter-spacing:-0.035em;
-margin-bottom:18px;
-position:relative;
-padding-left:14px;
+
+  font-size:24px;
+
+  letter-spacing:-0.035em;
+
+  font-weight:800;
+
 }
-h2::before{
-content:"";
-position:absolute;
-left:0;top:7px;bottom:7px;
-width:3px;
-border-radius:999px;
-background:linear-gradient(180deg,#0EA5E9,#A50034,#6366F1);
-box-shadow:0 0 6px rgba(59,130,246,0.6);
-}
+
 h3{
-font-size:18px;
-font-weight:800;
-letter-spacing:-0.01em;
-margin-bottom:8px;
+
+  font-size:16px;
+
+  font-weight:700;
+
+  letter-spacing:-0.01em;
+
 }
 
-p,li{
-font-size:14px;
-line-height:1.7;
-}
-p{margin:6px 0 8px}
-ul{margin:4px 0 0 0; padding-left:18px}
-li+li{margin-top:2px}
-.small{font-size:12px; color:var(--muted)}
-.sub{font-size:16px; color:#374151; letter-spacing:-.01em}
-hr.sep{border:none;border-top:1px solid var(--line);margin:10px 0 14px}
+.sub{
 
-/* 핵심 한 줄 요약 */
+  font-size:13px;
+
+  color:#374151;
+
+}
+
+.small{
+
+  font-size:12px;
+
+  color:var(--muted);
+
+}
+
+
+
+/* 핵심 한 줄 */
+
 .keyline{
-margin-top:6px;
-margin-bottom:6px;
-padding:8px 12px;
-border-radius:14px;
-background:#020617;
-color:#E5E7EB;
-font-size:13px;
-font-weight:600;
-display:inline-flex;
-align-items:center;
-gap:8px;
-box-shadow:0 10px 26px rgba(15,23,42,0.45);
-}
-.keyline::before{
-content:"★";
-font-size:12px;
-color:#FACC15;
-}
-.keyline b{
-color:#38BDF8;
+
+  margin-top:6px;
+
+  padding:8px 10px;
+
+  border-radius:8px;
+
+  border-left:3px solid var(--primary);
+
+  background:#F9FAFB;
+
+  font-size:13px;
+
+  font-weight:500;
+
 }
 
-/* 그리드 & 카드 */
-.grid-2{display:grid;grid-template-columns:1.05fr .95fr;gap:20px;margin-top:6px}
-.grid-2b{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-top:6px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:6px}
+.keyline b{
+
+  color:var(--primary);
+
+}
+
+
+
+/* 확장 레이아웃 – 좌측 요약, 우측 상세 */
+
+.layout-main{
+
+  flex:1;
+
+  display:grid;
+
+  grid-template-columns:minmax(0,1.05fr) minmax(0,1.35fr);
+
+  gap:18px;
+
+}
+
+.layout-main--reverse{
+
+  grid-template-columns:minmax(0,1.35fr) minmax(0,1.05fr);
+
+}
+
+@media(max-width:1024px){
+
+  .layout-main,
+
+  .layout-main--reverse{
+
+    display:flex;
+
+    flex-direction:column;
+
+  }
+
+}
+
+.col-summary{
+
+  border-radius:var(--radius);
+
+  border:1px solid var(--border-strong);
+
+  background:#F9FAFB;
+
+  padding:10px 11px 9px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+
+}
+
+.col-detail{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:10px;
+
+}
+
+
+
+/* 카드 */
 
 .card{
-border-radius:var(--radius);
-padding:16px 18px 16px;
-background:linear-gradient(145deg,#FFFFFF,#F9FAFB);
-border:1px solid rgba(148,163,184,0.45);
-box-shadow:0 10px 28px rgba(15,23,42,0.08);
-transition:
-transform .18s ease,
-box-shadow .18s ease,
-border .18s ease,
-background .18s ease;
-}
-.card:hover{
-transform:translateY(-2px);
-box-shadow:0 20px 40px rgba(15,23,42,0.16);
-border-color:rgba(14,165,233,0.9);
-background:linear-gradient(145deg,#FFFFFF,#EEF5FF);
-}
-.card h3{
-margin-bottom:6px;
-color:#111827;
+
+  border-radius:var(--radius);
+
+  border:1px solid var(--border);
+
+  padding:10px 11px 9px;
+
+  background:#F9FAFB;
+
 }
 
-/* 테이블 */
-.table{
-width:100%;
-border-collapse:separate;
-border-spacing:0;
-border-radius:18px;
-overflow:hidden;
-border:1px solid rgba(148,163,184,0.6);
-background:#FFFFFF;
-}
-.table th,.table td{
-padding:9px 12px;
-border-bottom:1px solid #E5E7EB;
-font-size:13px;
-vertical-align:top;
-}
-.table th{
-background:linear-gradient(135deg,#F3F4F6,#E5EEFF);
-font-weight:800;
-color:#111827;
-}
-.table tr:nth-child(even) td{
-background:#F9FAFB;
-}
-.table tr:last-child td{border-bottom:none}
+.card h3{margin-bottom:4px;}
 
-/* 정보 블럭 */
+.card p, .card li{font-size:13px;}
+
+.card ul{margin:4px 0 0 0; padding-left:17px;}
+
+.card li + li{margin-top:2px;}
+
+
+
+/* 강조 블럭 */
+
 .note,.tip,.risk{
-border-radius:14px;
-padding:9px 11px;
-font-size:13px;
+
+  border-radius:8px;
+
+  padding:7px 9px;
+
+  font-size:13px;
+
 }
+
 .note{
-border-left:4px solid var(--info);
-background:#F0F9FF;
-border:1px solid #BAE6FD;
-color:#0F172A;
+
+  border-left:3px solid var(--info);
+
+  background:#EFF6FF;
+
+  border:1px solid #DBEAFE;
+
 }
+
 .tip{
-border-left:4px solid var(--ok);
-background:#ECFDF3;
-border:1px solid #BBF7D0;
+
+  border-left:3px solid var(--ok);
+
+  background:#ECFDF3;
+
+  border:1px solid #BBF7D0;
+
 }
+
 .risk{
-border-left:4px solid var(--warn);
-background:#FFF7ED;
-border:1px solid #FED7AA;
+
+  border-left:3px solid var(--warn);
+
+  background:#FFF7ED;
+
+  border:1px solid #FED7AA;
+
 }
 
-/* mock / 이미지 */
+
+
+/* 표 */
+
+.table-wrap{margin-top:4px;}
+
+.table{
+
+  width:100%;
+
+  border-collapse:separate;
+
+  border-spacing:0;
+
+  border-radius:10px;
+
+  overflow:hidden;
+
+  border:1px solid var(--border);
+
+}
+
+.table th,.table td{
+
+  padding:7px 9px;
+
+  border-bottom:1px solid var(--border);
+
+  font-size:13px;
+
+}
+
+.table th{
+
+  background:#F3F4F6;
+
+  font-weight:700;
+
+}
+
+.table tr:nth-child(even) td{
+
+  background:#F9FAFB;
+
+}
+
+.table tr:last-child td{border-bottom:none;}
+
+
+
+/* 이미지/모형 */
+
 .mock{
-border-radius:18px;
-border:1px dashed #D1D5DB;
-background:#F9FAFB;
-padding:8px;
-display:flex;
-align-items:center;
-justify-content:center;
-min-height:170px;
-}
-.mock span{color:var(--muted); font-size:14px}
-.mock img{max-width:100%;height:auto;display:block;border-radius:12px}
 
-/* 애니메이션 */
-.reveal{opacity:0; transform:translateY(10px); transition:opacity .6s ease, transform .6s cubic-bezier(.2,.7,.2,1)}
-.show{opacity:1; transform:none}
-.stagger>*{opacity:0; transform:translateY(8px)}
-.stagger.show>*{opacity:1; transform:none; transition:opacity .55s ease, transform .55s ease}
-.stagger.show>*:nth-child(1){transition-delay:.06s}
-.stagger.show>*:nth-child(2){transition-delay:.12s}
-.stagger.show>*:nth-child(3){transition-delay:.18s}
-.stagger.show>*:nth-child(4){transition-delay:.24s}
-.stagger.show>*:nth-child(5){transition-delay:.30s}
+  border-radius:8px;
+
+  border:1px dashed #D1D5DB;
+
+  background:#F9FAFB;
+
+  padding:6px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-height:140px;
+
+}
+
+.mock img{
+
+  max-width:100%;
+
+  height:auto;
+
+  display:block;
+
+  border-radius:6px;
+
+}
+
+
+
+/* 페이지 번호 */
+
+.sno{
+
+  position:absolute;
+
+  right:18px;
+
+  bottom:12px;
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+
+
+/* 애니메이션 (조용하게) */
+
+.reveal{opacity:0; transform:translateY(4px); transition:opacity .25s ease, transform .25s ease;}
+
+.show{opacity:1; transform:none;}
+
+.stagger>*{opacity:0; transform:translateY(4px);}
+
+.stagger.show>*{
+
+  opacity:1; transform:none;
+
+  transition:opacity .25s ease, transform .25s ease;
+
+}
+
+.stagger.show>*:nth-child(1){transition-delay:.03s;}
+
+.stagger.show>*:nth-child(2){transition-delay:.06s;}
+
+.stagger.show>*:nth-child(3){transition-delay:.09s;}
+
+.stagger.show>*:nth-child(4){transition-delay:.12s;}
+
+.stagger.show>*:nth-child(5){transition-delay:.15s;}
+
+
 
 /* 마지막 슬라이드 */
+
 .thanks-title{
-position:relative;
-width:100%;
-text-align:center;
-font-size:32px;
-font-weight:900;
-letter-spacing:-0.05em;
-line-height:1.1;
-margin:0 auto 10px;
-color:var(--ink);
-}
-.thanks-title .thanks-underline{
-position:absolute;
-left:50%;
-bottom:-8px;
-height:3px;
-width:70%;
-transform:translateX(-50%) scaleX(0);
-transform-origin:left center;
-border-radius:999px;
-background:linear-gradient(90deg,#0EA5E9,#A50034,#6366F1);
-box-shadow:0 0 8px rgba(59,130,246,0.7);
-opacity:0;
-transition:transform .7s cubic-bezier(.2,.8,.2,1), opacity .6s ease;
-}
-.thanks-title.show .thanks-underline{
-transform:translateX(-50%) scaleX(1);
-opacity:1;
+
+  font-size:24px;
+
+  font-weight:800;
+
+  letter-spacing:-0.03em;
+
 }
 
-/* 로고 */
-.logo-biztechon{
-position:absolute; bottom:24px; right:32px;
-width:106px; height:auto; opacity:.96;
-filter:drop-shadow(0 2px 5px rgba(148,163,184,.8));
-pointer-events:none; user-select:none; z-index:50;
-}
-.slide > .logo-biztechon{ position:absolute }
+.thanks-sub{
 
-/* 컨트롤 */
+  margin-top:8px;
+
+}
+
+
+
+/* 하단 컨트롤 */
+
+.app-footer{
+
+  flex:0 0 auto;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  padding:6px 32px 10px;
+
+  box-sizing:border-box;
+
+  font-size:11px;
+
+  color:#9CA3AF;
+
+}
+
 .controls{
-position:absolute; left:50%; bottom:18px; transform:translateX(-50%);
-display:flex; align-items:center; gap:12px; font-size:13px;
-z-index:30;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
 }
-.navbtns{display:flex; gap:8px}
+
+.navbtns{display:flex;gap:6px;}
+
 .ctrl{
-border-radius:999px;
-padding:6px 13px;
-border:1px solid rgba(148,163,184,0.7);
-background:#FFFFFF;
-color:#374151;
-cursor:pointer;
-font-size:12px;
-display:inline-flex;
-align-items:center;
-gap:4px;
-box-shadow:0 8px 20px rgba(148,163,184,0.3);
-}
-.ctrl:hover{
-background:#EFF6FF;
-border-color:#0EA5E9;
-}
-.dots{display:flex; gap:6px}
-.dot{
-width:7px; height:7px; border-radius:999px;
-background:#D1D5DB;
-cursor:pointer;
-}
-.dot.active{
-background:#0EA5E9;
-box-shadow:0 0 0 4px rgba(14,165,233,0.25);
-}
 
-/* 진행률 바 – 고급형 */
-.progress{
-position:absolute;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-width:280px;
-height:8px;
-border-radius:999px;
-background:rgba(255,255,255,0.9);
-border:1px solid rgba(209,213,219,0.9);
-z-index:30;
-overflow:hidden;
-box-shadow:
-0 6px 14px rgba(148,163,184,0.6),
-0 0 0 1px rgba(255,255,255,0.9);
-}
-.progress-inner{
-height:100%;
-width:0;
-border-radius:inherit;
-background:linear-gradient(90deg,#0EA5E9,#22C55E,#A855F7,#A50034);
-background-size:200% 100%;
-box-shadow:0 0 10px rgba(56,189,248,0.75);
-transition:width .6s cubic-bezier(.22,.8,.22,1);
-animation:progressShimmer 4s linear infinite;
-}
-@keyframes progressShimmer{
-0%{background-position:0% 50%}
-100%{background-position:200% 50%}
-}
-
-/* HTML CODE 배지 */
-.html-pill{
-position:absolute;
-top:20px;
-right:32px;
-display:inline-flex;
-align-items:center;
-gap:6px;
-padding:6px 11px;
-border-radius:999px;
-border:1px solid rgba(148,163,184,0.7);
-background:rgba(255,255,255,0.96);
-box-shadow:0 10px 26px rgba(148,163,184,0.5);
-font-size:11px;
-color:#4B5563;
-z-index:40;
-backdrop-filter:blur(10px);
-}
-.html-pill .code{
-font-family:Consolas, "Fira Code", monospace;
-font-size:12px;
-padding:2px 6px;
-border-radius:999px;
-background:#EFF6FF;
-color:#0EA5E9;
-box-shadow:0 0 0 1px rgba(191,219,254,0.9);
-}
-.html-pill .label{
-text-transform:uppercase;
-letter-spacing:.12em;
-font-weight:600;
-color:#6B7280;
-}
-
-/* 힌트 */
-.hint{
-position:absolute;
-left:32px;
-bottom:20px;
-font-size:11px;
-color:#6B7280;
-background:#FFFFFF;
-padding:4px 11px;
-border-radius:999px;
-border:1px solid rgba(148,163,184,0.7);
-box-shadow:0 8px 20px rgba(148,163,184,0.4);
-z-index:35;
-}
-
-/* ===== 세미나 출결 라이브 데모 전용 스타일 ===== */
-.attend-shell {
-  width:100%;
-  max-width:780px;
-  margin:0 auto;
-}
-
-.attend-card {
-  background:#ffffff;
-  border-radius:24px;
-  box-shadow:0 18px 45px rgba(15,23,42,0.12);
-  border:1px solid rgba(148,163,184,0.25);
-  padding:26px 24px 22px;
-}
-
-.attend-header {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:18px;
-}
-
-.attend-title-wrap {
-  cursor:pointer; /* 제목 3번 클릭 → 운영자 설정 */
-}
-
-.attend-eyebrow {
-  font-size:11px;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:#6b7280;
-  margin-bottom:4px;
-}
-
-.attend-title {
-  font-size:22px;
-  font-weight:700;
-  line-height:1.25;
-}
-
-.attend-badge {
-  font-size:11px;
-  padding:6px 10px;
   border-radius:999px;
-  background:#a50034;
-  color:#ffffff;
-  box-shadow:0 6px 15px rgba(165,0,52,0.3);
-  white-space:nowrap;
-}
 
-.attend-subtitle {
-  font-size:13px;
-  color:#6b7280;
-  margin-bottom:18px;
-}
+  border:1px solid #D1D5DB;
 
-/* 폼 영역 */
-.attend-form {
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  margin-bottom:10px;
-}
+  background:#FFFFFF;
 
-.attend-field {
-  text-align:left;
-}
+  padding:5px 11px;
 
-.attend-label-row {
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  margin-bottom:4px;
-}
-
-.attend-label {
-  font-size:13px;
-  font-weight:500;
-}
-
-.attend-hint {
   font-size:11px;
-  color:#6b7280;
-}
 
-/* input / button은 카드 내부에만 스타일 적용 */
-.attend-card input {
-  width:100%;
-  border-radius:14px;
-  border:1px solid #e5e7eb;
-  padding:9px 11px;
-  font-size:14px;
-  background:#f9fafb;
-  transition:border-color .18s ease, background .18s ease, box-shadow .18s ease;
-}
-
-.attend-card input:focus {
-  outline:none;
-  border-color:#a50034;
-  background:#ffffff;
-  box-shadow:0 0 0 1px rgba(165,0,52,0.25);
-}
-
-.attend-pin-input {
-  letter-spacing:.32em;
-  text-align:center;
-  font-family:"SF Mono","JetBrains Mono",Consolas,monospace;
-}
-
-.attend-card button {
-  border:none;
-  border-radius:999px;
-  padding:10px 16px;
-  font-size:14px;
-  font-weight:600;
   cursor:pointer;
-  display:inline-flex;
+
+}
+
+.ctrl:hover{
+
+  background:#F3F4F6;
+
+}
+
+.dots{display:flex; gap:5px;}
+
+.dot{
+
+  width:7px;
+
+  height:7px;
+
+  border-radius:999px;
+
+  background:#D4D4D8;
+
+  cursor:pointer;
+
+}
+
+.dot.active{
+
+  background:var(--primary);
+
+}
+
+
+
+/* ===== 세미나 출결 라이브 데모 스타일 ===== */
+
+.attend-shell{
+
+  width:100%;
+
+  max-width:720px;
+
+}
+
+.attend-card{
+
+  background:#FFFFFF;
+
+  border-radius:var(--radius);
+
+  border:1px solid var(--border);
+
+  padding:12px 11px 10px;
+
+}
+
+.attend-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
   align-items:center;
-  justify-content:center;
-  gap:6px;
-  background:#a50034;
-  color:#ffffff;
-  margin-top:4px;
-  transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-  box-shadow:0 10px 25px rgba(165,0,52,0.28);
+
+  gap:12px;
+
+  margin-bottom:8px;
+
 }
 
-.attend-card button:active {
-  transform:translateY(1px);
-  box-shadow:0 5px 12px rgba(165,0,52,0.35);
+.attend-title-wrap{
+
+  cursor:pointer;
+
 }
 
-.attend-card button[disabled] {
-  opacity:.65;
-  cursor:wait;
-  box-shadow:none;
-}
+.attend-eyebrow{
 
-.attend-status {
-  font-size:12px;
-  margin-top:6px;
-  min-height:18px;
-}
-
-.attend-status.ok {
-  color:#16a34a;
-}
-
-.attend-status.err {
-  color:#b91c1c;
-}
-
-.attend-footer {
-  margin-top:10px;
-  padding-top:10px;
-  border-top:1px dashed #e5e7eb;
-  min-height:8px;
   font-size:11px;
-  color:#6b7280;
+
+  letter-spacing:.12em;
+
+  text-transform:uppercase;
+
+  color:var(--muted);
+
 }
+
+.attend-title{
+
+  font-size:16px;
+
+  font-weight:700;
+
+}
+
+.attend-badge{
+
+  font-size:11px;
+
+  padding:6px 10px;
+
+  border-radius:999px;
+
+  background:var(--primary);
+
+  color:#FFFFFF;
+
+  white-space:nowrap;
+
+}
+
+.attend-subtitle{
+
+  font-size:13px;
+
+  color:var(--muted);
+
+  margin-bottom:10px;
+
+}
+
+.attend-form{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+
+  margin-bottom:8px;
+
+}
+
+.attend-field{text-align:left;}
+
+.attend-label-row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-end;
+
+  margin-bottom:3px;
+
+}
+
+.attend-label{
+
+  font-size:13px;
+
+  font-weight:500;
+
+}
+
+.attend-hint{
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+.attend-card input{
+
+  width:100%;
+
+  border-radius:7px;
+
+  border:1px solid #D1D5DB;
+
+  padding:7px 9px;
+
+  font-size:13px;
+
+  background:#F9FAFB;
+
+}
+
+.attend-card input:focus{
+
+  outline:none;
+
+  border-color:var(--primary);
+
+  background:#FFFFFF;
+
+}
+
+.attend-pin-input{
+
+  letter-spacing:.32em;
+
+  text-align:center;
+
+  font-family:"SF Mono","JetBrains Mono",Consolas,monospace;
+
+}
+
+.attend-card button{
+
+  border:none;
+
+  border-radius:999px;
+
+  padding:7px 12px;
+
+  font-size:13px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+  background:var(--primary);
+
+  color:#FFFFFF;
+
+}
+
+.attend-card button[disabled]{
+
+  opacity:.7;
+
+  cursor:wait;
+
+}
+
+.attend-status{
+
+  font-size:12px;
+
+  margin-top:5px;
+
+  min-height:18px;
+
+}
+
+.attend-status.ok{color:var(--ok);}
+
+.attend-status.err{color:#B91C1C;}
+
+.attend-footer{
+
+  margin-top:7px;
+
+  padding-top:7px;
+
+  border-top:1px dashed #E5E7EB;
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+
 
 /* 운영자 설정 모달 */
-.attend-admin-backdrop {
+
+.attend-admin-backdrop{
+
   position:fixed;
+
   inset:0;
-  background:rgba(15,23,42,0.32);
+
+  background:rgba(15,23,42,0.25);
+
   display:none;
+
   align-items:center;
+
   justify-content:center;
-  z-index:140;
+
+  z-index:120;
+
 }
 
-.attend-admin-card {
-  background:#ffffff;
-  border-radius:20px;
-  padding:20px 18px 16px;
+.attend-admin-card{
+
+  background:#FFFFFF;
+
+  border-radius:var(--radius);
+
+  padding:14px 13px 10px;
+
   width:100%;
-  max-width:380px;
-  box-shadow:0 20px 45px rgba(15,23,42,0.3);
-  border:1px solid rgba(148,163,184,0.5);
+
+  max-width:340px;
+
+  box-shadow:0 18px 40px rgba(15,23,42,0.45);
+
+  border:1px solid var(--border);
+
 }
 
-.attend-admin-title {
+.attend-admin-title{
+
   font-size:15px;
+
   font-weight:600;
-  margin-bottom:6px;
+
+  margin-bottom:4px;
+
 }
 
-.attend-admin-sub {
+.attend-admin-sub{
+
   font-size:12px;
-  color:#6b7280;
-  margin-bottom:12px;
+
+  color:var(--muted);
+
+  margin-bottom:8px;
+
 }
 
-.attend-admin-actions {
+.attend-admin-actions{
+
   display:flex;
+
   justify-content:flex-end;
+
   gap:8px;
-  margin-top:12px;
+
+  margin-top:10px;
+
 }
 
-.attend-btn-secondary {
-  background:#f3f4f6;
+.attend-btn-secondary{
+
+  background:#F3F4F6;
+
   color:#111827;
-  box-shadow:none;
+
+  border-radius:999px;
+
+  padding:6px 10px;
+
+  border:none;
+
+  font-size:12px;
+
+  cursor:pointer;
+
 }
 
-.attend-admin-check {
+.attend-admin-check{
+
   display:flex;
+
   align-items:center;
+
   gap:6px;
+
   margin-top:6px;
+
   font-size:13px;
+
 }
 
-.attend-admin-check input {
+.attend-admin-check input{
+
   width:auto;
-  padding:0;
-  box-shadow:none;
+
 }
 
-@media (max-width:600px) {
-  .attend-card {padding:22px 18px 18px;}
-  .attend-title {font-size:20px;}
+
+
+/* ===== 개강 안내 Live 데모 스타일 ===== */
+
+.guide-shell{
+
+  width:100%;
+
+  max-width:780px;
+
 }
+
+.guide-card{
+
+  background:#FFFFFF;
+
+  border-radius:var(--radius);
+
+  border:1px solid var(--border);
+
+  padding:12px 11px 10px;
+
+}
+
+.guide-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:12px;
+
+  margin-bottom:8px;
+
+}
+
+.guide-eyebrow{
+
+  font-size:11px;
+
+  letter-spacing:.12em;
+
+  text-transform:uppercase;
+
+  color:var(--muted);
+
+}
+
+.guide-title{
+
+  font-size:16px;
+
+  font-weight:700;
+
+}
+
+.guide-chip{
+
+  font-size:11px;
+
+  padding:6px 10px;
+
+  border-radius:999px;
+
+  background:var(--primary);
+
+  color:#FFFFFF;
+
+  white-space:nowrap;
+
+}
+
+.guide-subtitle{
+
+  font-size:13px;
+
+  color:var(--muted);
+
+  margin-bottom:8px;
+
+}
+
+.guide-meta-grid{
+
+  display:grid;
+
+  grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);
+
+  gap:8px;
+
+}
+
+@media(max-width:900px){
+
+  .guide-meta-grid{grid-template-columns:1fr;}
+
+}
+
+.guide-block{
+
+  border-radius:8px;
+
+  border:1px solid #E5E7EB;
+
+  background:#F9FAFB;
+
+  padding:7px 8px 6px;
+
+}
+
+.guide-block-title{
+
+  font-size:12px;
+
+  font-weight:600;
+
+  color:var(--muted);
+
+  margin-bottom:3px;
+
+}
+
+.guide-row{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:8px;
+
+  font-size:13px;
+
+}
+
+.guide-row + .guide-row{margin-top:3px;}
+
+.guide-label{
+
+  color:var(--muted);
+
+  min-width:64px;
+
+}
+
+.guide-value{
+
+  color:#111827;
+
+  text-align:right;
+
+  font-weight:500;
+
+}
+
+.guide-footer{
+
+  margin-top:8px;
+
+  padding-top:7px;
+
+  border-top:1px dashed #E5E7EB;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:10px;
+
+}
+
+.guide-btns{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+
+}
+
+.guide-btn{
+
+  border:none;
+
+  border-radius:999px;
+
+  padding:6px 10px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:5px;
+
+  background:var(--primary);
+
+  color:#FFFFFF;
+
+}
+
+.guide-btn.secondary{
+
+  background:#F3F4F6;
+
+  color:#111827;
+
+}
+
+.guide-btn span.icon{
+
+  font-size:13px;
+
+}
+
+.guide-note{
+
+  font-size:11px;
+
+  color:var(--muted);
+
+}
+
+.guide-result{
+
+  margin-top:8px;
+
+  border-radius:8px;
+
+  border:1px dashed #D4D4D8;
+
+  background:#F9FAFF;
+
+  padding:7px 8px;
+
+  font-size:12px;
+
+  color:#111827;
+
+  display:none;
+
+  white-space:pre-line;
+
+}
+
+.guide-result.show{display:block;}
+
+
+
+/* 포커스 모드 (F키) – 헤더/풋터 숨김 */
+
+body.focus-mode .app-header,
+
+body.focus-mode .app-footer,
+
+body.focus-mode .progress-bar{
+
+  display:none!important;
+
+}
+
+body.focus-mode .deck-wrapper{
+
+  padding:10px 10px 8px;
+
+}
+
+body.focus-mode .deck{
+
+  max-width:100%;
+
+  height:100%;
+
+}
+
+
 
 /* 인쇄 */
+
 @media print{
-body{background:#FFFFFF;}
-.viewport{overflow:visible; background:#FFFFFF;}
-.deck{display:block; transform:none}
-.slide{
-min-width:auto; height:210mm; width:297mm; margin:10mm auto;
-padding:0;
-break-after:page;
+
+  body{background:#FFFFFF;}
+
+  .app-shell{
+
+    height:auto;
+
+  }
+
+  .deck-wrapper{
+
+    padding:0;
+
+  }
+
+  .deck{
+
+    box-shadow:none;
+
+    border-radius:0;
+
+    border:none;
+
+    display:block;
+
+  }
+
+  .slide{
+
+    page-break-after:always;
+
+    min-height:180mm;
+
+  }
+
+  .app-footer,.progress-bar,.app-header{display:none!important;}
+
+  .reveal,.stagger>*{
+
+    opacity:1!important;
+
+    transform:none!important;
+
+  }
+
 }
-.slide::before{display:none}
-.inner{
-box-shadow:none;
-border-radius:0;
-border:none;
-width:auto; max-width:none;
-}
-.controls,.progress,.html-pill,.hint{display:none}
-.reveal,
-.stagger > *{
-opacity:1 !important;
-transform:none !important;
-}
-}
+
 </style>
+
 </head>
+
 <body>
-<div class="viewport">
 
-<div class="progress">
-<div class="progress-inner" id="progressInner"></div>
-</div>
+<div class="app-shell">
 
-<div class="deck" id="deck">
 
-<!-- 1. 표지 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Education Operation · Demo</span>
-</div>
-<h1 class="reveal">AI로 구현한 스마트 교육운영</h1>
-<p class="sub reveal">사내 도구와 AI로 만든 실무형 자동화 파일럿</p>
-<div class="keyline reveal">
-오늘 목표: <b>“실제 업무에 당장 쓸 수 있는 수준의 개선”</b>을 공유합니다.
-</div>
-<hr class="sep">
-<p class="small reveal">교육운영파트 김미진 사원 · 2025-11-03</p>
-</div>
-<div class="sno">1</div>
-</section>
 
-<!-- 2. 왜 지금, 왜 사내 도구인가? -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Context</span>
-</div>
-<h2 class="reveal">왜 지금, 왜 사내 도구인가?</h2>
-<div class="keyline reveal">
-<b>외부 솔루션 없이</b>도, 지금 가진 MS 도구와 AI만으로 <b>운영 품질을 끌어올릴 수 있는지</b>를 검증한 파일럿입니다.
-</div>
-<div class="grid-2b stagger">
- <div class="card">
-<h3>Why now?</h3>
-<ul>
-<li>교육 안내·보고 메일을 연간 다수 수기 작성</li>
-<li>담당자·과정마다 서식·문체가 달라 검수 공수 증가</li>
-<li>해킹대회·세미나 확대 → 오류·누락 리스크 커짐</li>
-</ul>
- </div>
- <div class="card">
-<h3>사내 도구 중심 운영</h3>
-<ul>
-<li>MS365 / Outlook / Teams / Forms 기반</li>
-<li>외부 AI·툴 없이도 운영 가능한 구조</li>
-<li>GitHub Copilot 등 사내 허용 AI로 보조 활용</li>
-</ul>
-<div class="note" style="margin-top:8px">
-보안·권한 이슈 없이 <b>바로 확산</b> 가능한 수준의 파일럿입니다.
-</div>
- </div>
-</div>
-</div>
-<div class="sno">2</div>
-</section>
+  <!-- 헤더 -->
 
-<!-- 3. 현황 · 문제 인식 · 개선 목표 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Problem & Goals</span>
-</div>
-<h2 class="reveal">현황 · 문제 인식 · 개선 목표</h2>
-<div class="keyline reveal">
-<b>“많이 바쁘지만, 늘 비슷한 일을 반복한다”</b>는 현장의 피로를 줄이는 것이 출발점이었습니다.
-</div>
-<div class="grid-3 stagger">
- <div class="card">
-<h3>추진 배경</h3>
-<ul>
-<li>교육 안내·보고 문서 다수, 담당자별 형식 제각각</li>
-<li>형식 검수·수정에 건당 20~30분 추가</li>
-<li>대규모 행사 시 오류·재작성 공수 발생</li>
-</ul>
- </div>
- <div class="card">
-<h3>현장의 문제 인식</h3>
-<ul>
-<li>과정명·일시·장소 매번 재입력 → 복붙 오타</li>
-<li>폰트·여백·문체 불일치로 가독성 저하</li>
-<li>출석·결과·보고 흐름이 끊겨 재작성 반복</li>
-</ul>
- </div>
- <div class="card">
-<h3>개선 목표 (운영 원칙)</h3>
-<ul>
-<li><b>단순 Simple</b> – 한 번 입력해 여러 단계 활용</li>
-<li><b>일정 Steady</b> – 서식·문체 기준 통일</li>
-<li><b>연결 Connected</b> – 공지→출석→보고 흐름 유지</li>
-</ul>
- </div>
-</div>
-<div class="tip reveal" style="margin-top:12px">
-이번 파일럿은 이 세 가지 원칙을 <b>실제 업무</b>에 적용해 본 첫 시도입니다.
-</div>
-</div>
-<div class="sno">3</div>
-</section>
+  <header class="app-header">
 
-<!-- 4. 이번에 직접 개선한 3가지 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Overview</span>
-</div>
-<h2 class="reveal">이번에 직접 개선한 3가지</h2>
-<div class="keyline reveal">
-오늘 데모는 <b>“메일 템플릿 · 안내 사이트 · PIN 출석”</b>, 세 가지 개선 흐름으로 보시면 됩니다.
-</div>
-<div class="grid-3 stagger">
- <div class="card">
-<h3>① HTML 템플릿 (메일·인쇄)</h3>
-<ul>
-<li>공지 메일·인쇄물을 <b>단일 HTML</b> 템플릿으로 생성</li>
-<li>Outlook·EP 메일 호환, 레이아웃 깨짐 최소화</li>
-<li>운영 원칙: <b>단순 · 일정</b></li>
-</ul>
- </div>
- <div class="card">
-<h3>② 개강 안내 사이트</h3>
-<ul>
-<li>기존 안내문을 <b>웹 페이지</b>로 전환</li>
-<li>외부 강사·내부 구성원이 같은 화면 기준 사용</li>
-<li>운영 원칙: <b>일정 · 연결</b></li>
-</ul>
- </div>
- <div class="card">
-<h3>③ PIN 기반 세미나 출석</h3>
-<ul>
-<li>Class별 PIN 코드로 공용 PC에서 출석 입력</li>
-<li>MS 연동으로 출석 시간·명단 자동 기록</li>
-<li>운영 원칙: <b>단순 · 연결</b></li>
-</ul>
- </div>
-</div>
-<p class="small reveal" style="margin-top:8px">
-이제부터 데모 1~3번을 위 세 가지 개선 포인트 순서로 보여드리겠습니다.
-</p>
-</div>
-<div class="sno">4</div>
-</section>
+    <div class="header-left">
 
-<!-- 5. 개선 1 – HTML 템플릿 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Demo 1 · HTML Template</span>
-</div>
-<h2 class="reveal">개선 1 – HTML 템플릿 (메일·인쇄)</h2>
-<div class="keyline reveal">
-<b>“메일·인쇄물은 템플릿 1종으로 통일”</b> → 작성 시간은 줄이고, 품질은 일정하게.
-</div>
-<div class="grid-2">
- <div class="card reveal">
-<h3>Before · 수기 메일·이미지</h3>
-<ul>
-<li>과정마다 Word/PowerPoint 양식을 새로 작성</li>
-<li>EP·Outlook에서 이미지·줄바꿈 깨짐</li>
-<li>작성+검수 포함 1건당 약 35분 소요</li>
-</ul>
-<div class="risk" style="margin-top:8px">
-담당자·과정이 바뀔 때마다 <b>처음부터 다시 만드는 느낌</b>이 반복되었습니다.
-</div>
- </div>
- <div class="card reveal">
-<h3>After · HTML 템플릿 1종 통일</h3>
-<div class="mock">
-<img src="images/mail_template_sample.png" alt="HTML 메일 템플릿 예시">
-</div>
-<ul style="margin-top:8px">
-<li>과정명·일시만 입력하면 안내문이 <b>자동 생성</b></li>
-<li>버튼·색상·폰트 통일 → 운영 품질 일정화</li>
-<li>제작 시간 약 7분, 약 80% 단축</li>
-</ul>
-<p class="small">
-※ 이미지는 <code>images/mail_template_sample.png</code>를 실제 캡처로 교체해 사용.
-</p>
- </div>
-</div>
-</div>
-<div class="sno">5</div>
-</section>
+      <img class="header-logo" src="https://raw.githubusercontent.com/Edulorix/any/main/발표장료/biztechon_logo.png" alt="LG Electronics / BizTechON">
 
-<!-- 6. 개선 2 – 개강 안내 사이트 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Demo 2 · Opening Site</span>
-</div>
-<h2 class="reveal">개선 2 – 개강 안내 사이트</h2>
-<div class="keyline reveal">
-<b>핵심 안내는 “메일 + 웹 한 페이지”로</b> → 강사·교육생 모두 같은 화면을 봅니다.
-</div>
-<div class="grid-2">
- <div class="card reveal">
-<h3>역할</h3>
-<ul>
-<li>Magok Lecture Guide 등 방문·개강 정보를 한 화면에 정리</li>
-<li>외부 강사·내부 구성원이 동일한 정보 기준 사용</li>
-<li>메일 안내문에서 <b>링크 한 번</b>으로 바로 접속</li>
-</ul>
-<div class="note" style="margin-top:8px">
-데모에서는 <b>개강 안내 사이트만</b> 브라우저 링크로 직접 접속해 보여드립니다.
-</div>
-<p class="small" style="margin-top:6px">
-(운영 URL 예시)&nbsp;
-<a class="en" href="https://example.com/magok-lecture-guide" target="_blank">
-https://example.com/magok-lecture-guide
-</a><br>
-※ 발표 전 실제 사내 URL로 교체.
-</p>
- </div>
- <div class="card reveal">
-<h3>화면 예시</h3>
-<div class="mock">
-<img src="images/lecture_guide_sample.png" alt="개강 안내 사이트 예시">
-</div>
-<p class="small">
-방문 절차, 주차, 출입 등을 <b>한 페이지</b>로 통합해 
-“메일 + 웹” 조합으로 안내합니다.
-</p>
- </div>
-</div>
-</div>
-<div class="sno">6</div>
-</section>
+      <div class="header-title-wrap">
 
-<!-- 7. 개선 3 – 세미나 출석 (설명 슬라이드) -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Demo 3 · Attendance</span>
-</div>
-<h2 class="reveal">개선 3 – 세미나 출석 흐름</h2>
-<div class="keyline reveal">
-<b>종이 서명 대신 “PIN + 자동 기록”</b> → 출석 누락과 수기 정리를 한 번에 줄였습니다.
-</div>
-<div class="grid-3 stagger">
- <div class="card">
-<h3>Before · 종이 출석</h3>
-<ul>
-<li>종이에 서명, 필기체·누락으로 재확인 필요</li>
-<li>명단과 수기로 대조하며 인원 체크</li>
-<li>출석 정리·입력에 추가 공수 발생</li>
-</ul>
- </div>
- <div class="card">
-<h3>After · PIN 출석</h3>
-<ul>
-<li>Class별 PIN을 공용 PC에서 입력</li>
-<li>MS 연동으로 출석 시간·명단 자동 기록</li>
-<li>출석 누락 0건, 수기 정리 공수 감소</li>
-</ul>
- </div>
- <div class="card">
-<h3>시연 방식</h3>
-<ul>
-<li>실제 운영 화면을 공용 PC 2대로 녹화</li>
-<li>발표 시에는 링크 접속 없이 <b>영상</b>으로 흐름 시연</li>
-<li>“이전 불편 → 개선 화면”이 한눈에 보이도록 구성</li>
-</ul>
- </div>
-</div>
-<div class="tip reveal" style="margin-top:12px">
-출석만 자동화한 것이 아니라, <b>운영 흐름</b> 전체를 정리한 것이 포인트입니다.
-</div>
-</div>
-<div class="sno">7</div>
-</section>
+        <div class="header-title">AI로 구현한 스마트 교육운영</div>
 
-<!-- 7-1. 세미나 출결 Live Demo -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Demo 3 · Live</span>
-</div>
-<h2 class="reveal">세미나 출결 – 라이브 데모</h2>
-<p class="sub reveal">
-실제처럼 이름 · 사번 · PIN을 입력해 보고,<br>
-Power Automate로 출석 데이터가 넘어가는 흐름을 바로 보여드립니다.
-</p>
+        <div class="header-sub" id="headerSectionLabel">교육운영 파일럿 · HTML 템플릿 · 개강 안내 · PIN 출석</div>
 
-<div class="attend-shell reveal" style="margin-top:10px">
-  <div class="attend-card">
-    <div class="attend-header">
-      <div class="attend-title-wrap" id="attendTitleWrap">
-        <div class="attend-eyebrow">SEMINAR ATTENDANCE</div>
-        <div class="attend-title" id="attendPageTitle">세미나 출결</div>
       </div>
-      <div class="attend-badge" id="attendCourseBadge">과정명: 리스크 관리</div>
+
     </div>
 
-    <p class="attend-subtitle">
-      아래 정보를 입력 후 <strong>출석 체크</strong>를 눌러 주세요.<br>
-      PIN 번호가 일치하면 출석이 자동 기록됩니다.
-    </p>
+    <div class="header-right">
 
-    <form id="attendanceForm" class="attend-form">
-      <div class="attend-field">
-        <div class="attend-label-row">
-          <label class="attend-label" for="attendName">이름</label>
-        </div>
-        <input id="attendName" required placeholder="예) 홍길동">
-      </div>
-      <div class="attend-field">
-        <div class="attend-label-row">
-          <label class="attend-label" for="attendEmpId">사번</label>
-        </div>
-        <input id="attendEmpId" required placeholder="예) 12345678">
-      </div>
-      <div class="attend-field">
-        <div class="attend-label-row">
-          <label class="attend-label" for="attendPin">PIN 번호</label>
-          <span class="attend-hint">운영자가 안내한 6자리</span>
-        </div>
-        <input id="attendPin" type="password" maxlength="6"
-               class="attend-pin-input" required placeholder="••••••">
-      </div>
+      <div class="header-tag">EDU OPERATION · DEMO</div>
 
-      <button type="submit" id="attendSubmitBtn">출석 체크</button>
-      <div class="attend-status" id="attendStatusMsg"></div>
-    </form>
+      <div class="header-section" id="headerSectionShort">Cover</div>
 
-    <div class="attend-footer">
-      ※ 데모용 화면입니다. 실제 운영 시에는 조직 정책에 맞춰 Power Automate URL을 설정합니다.
+      <div class="header-page" id="headerPageInfo">1 / 15</div>
+
     </div>
+
+  </header>
+
+
+
+  <!-- 진행률 -->
+
+  <div class="progress-bar">
+
+    <div class="progress">
+
+      <div class="progress-inner" id="progressInner"></div>
+
+    </div>
+
   </div>
-</div>
-</div>
-<div class="sno">7·Live</div>
-</section>
 
-<!-- 8. 토큰 & CSV -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Structure</span>
-</div>
-<h2 class="reveal">토큰 & CSV 기반 구조</h2>
-<div class="keyline reveal">
-<b>“한 번만 정확히 입력하고, 나머지는 코드가 대신”</b>하는 구조로 바꿨습니다.
-</div>
-<table class="table reveal">
- <tr><th>토큰</th><th>설명</th><th>예시</th><th>규칙</th></tr>
- <tr><td>{과정명}</td><td>교육 명칭</td><td>SW Security 101</td><td>고정 명칭</td></tr>
- <tr><td>{일시}</td><td>교육 일시</td><td>2025-11-18 09:00</td><td>YYYY-MM-DD HH:MM</td></tr>
- <tr><td>{장소}</td><td>교육장</td><td>ISC Vision Hall</td><td>사내 약칭</td></tr>
- <tr><td>{강사}</td><td>강사명</td><td>홍길동</td><td>선택</td></tr>
- <tr><td>{문의처}</td><td>담당 연락처</td><td>교육운영 1234</td><td>필수</td></tr>
-</table>
-<div class="note reveal" style="margin-top:10px">
-<ul>
- <li>CSV 업로드로 명단을 만들고, 토큰에 <b>한 번만</b> 값을 넣습니다.</li>
- <li>토큰 누락·오타는 발송 전 자동 감지해 <b>오류 메일</b>을 차단합니다.</li>
-</ul>
-</div>
-</div>
-<div class="sno">8</div>
-</section>
 
-<!-- 9. 성과 요약 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Impact</span>
-</div>
-<h2 class="reveal">성과 요약</h2>
-<div class="keyline reveal">
-핵심은 <b>“시간 80% 절감 + 오류 0건”</b>, 그리고 교육 경험의 체감 품질 상승입니다.
-</div>
-<table class="table reveal">
-<tr><th>항목</th><th>Before</th><th>After</th><th>변화</th></tr>
-<tr><td>제작 시간</td><td>35분</td><td><b>7분</b></td><td><b>-80%</b></td></tr>
-<tr><td>서식 오류</td><td>월 7건</td><td><b>0건</b></td><td>해결</td></tr>
-<tr><td>문의</td><td>주 10건</td><td>7건</td><td>-30%</td></tr>
-<tr><td>만족도</td><td>68점</td><td><b>93점</b></td><td>+25pt</td></tr>
-</table>
-<div class="grid-3" style="margin-top:12px">
- <div class="card"><h3>운영자</h3><p>반복 작업 ↓, 기획·소통에 쓰는 시간 ↑</p></div>
- <div class="card"><h3>강사</h3><p>일관된 안내문으로 사전 준비·문의가 명확</p></div>
- <div class="card"><h3>교육생</h3><p>출석·안내 혼선 감소, 경험 만족도 상승</p></div>
-</div>
-</div>
-<div class="sno">9</div>
-</section>
 
-<!-- 10. 기능 활용성 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Extension</span>
-</div>
-<h2 class="reveal">기능 활용성</h2>
-<div class="keyline reveal">
-<b>“새 시스템 도입”이 아니라,</b> 지금 있는 문서·코드를 <b>같이 쓰기 좋게 정리한 것</b>에 가깝습니다.
-</div>
-<div class="grid-2b stagger">
- <div class="card">
-<h3>조직별 활용 방안</h3>
-<ul>
-<li>공통 템플릿 세트 → 본부별 맞춤 수정</li>
-<li>Teams 채널로 HTML 코드·샘플·Tip 공유</li>
-<li>정기 공지/보고 일정 알림 + 양식 링크 제공</li>
-</ul>
- </div>
- <div class="card">
-<h3>협업 부서</h3>
-<ul>
-<li>기획팀: 보고 항목·지표 정의</li>
-<li>HRD: 일정표·출석 절차 개선</li>
-<li>인재육성: 양식 통합 제안 및 사내 확산</li>
-</ul>
- </div>
-</div>
-<div class="tip reveal" style="margin-top:12px">
-새 시스템이 아니라, <b>함께 쓰는 문서·코드</b>를 정리한 결과물에 가깝습니다.
-</div>
-</div>
-<div class="sno">10</div>
-</section>
+  <!-- 슬라이드 데크 -->
 
-<!-- 11. 향후 계획 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Next Step</span>
-</div>
-<h2 class="reveal">향후 계획</h2>
-<div class="keyline reveal">
-파일럿에서 끝이 아니라, <b>“세미나 출결 · 안내 사이트” 두 축으로 계속 확장</b>해 볼 계획입니다.
-</div>
-<table class="table reveal">
- <tr><th>현재 구현</th><th>향후 디벨롭 방향</th></tr>
- <tr>
-<td>PIN 기반 출석 사이트</td>
-<td>
-MS 계정 연동으로 출석 기록 자동화 안정화<br>
-타 조직도 활용할 수 있도록 운영 매뉴얼·예시 화면 정리
-</td>
- </tr>
- <tr>
-<td>외부 강사 정보 입력 + Email 자동 메일링</td>
-<td>
-MS 환경과 연동해 데이터 자동 축적 보완<br>
-다른 교육에서도 바로 쓸 수 있는 <b>정형 템플릿</b>으로 배포
-</td>
- </tr>
- <tr>
-<td>HTML 메일 템플릿</td>
-<td>
-HTML 활용 스터디 진행<br>
-다수가 직접 수정·재사용할 수 있도록 사례 공유
-</td>
- </tr>
- <tr>
-<td>CSV 업로드 기반 명단 생성</td>
-<td>
-실시간 데이터 분석 → 보고 자동화·시각화 샘플 생성<br>
-반복 보고 포맷을 HTML/Excel 템플릿으로 정리
-</td>
- </tr>
-</table>
-<div class="note reveal" style="margin-top:10px">
-실제 내부 To-do<br>
-① 세미나 출결 MS 연동 완성<br>
-② 개강 안내/확정 사이트 고도화<br>
-두 축으로 꾸준히 정리해 나갈 예정입니다.
-</div>
-</div>
-<div class="sno">11</div>
-</section>
+  <main class="deck-wrapper">
 
-<!-- 12. 프롬프트 & 코파일럿 활용 팁 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>How-to · AI</span>
-</div>
-<h2 class="reveal">프롬프트 & 코파일럿 활용 팁</h2>
-<div class="keyline reveal">
-AI는 <b>“완성품”이 아니라 “초안 + 검수 보조”</b>로 쓸 때, 운영 품질이 가장 안전했습니다.
-</div>
-<div class="grid-2b stagger">
- <div class="card">
-<h3>프롬프트 작성 3원칙</h3>
-<ul>
-<li><b>맥락 먼저</b> – “교육 안내 메일 초안, 대상: 내부 임직원”</li>
-<li><b>형식 지정</b> – 제목/본문/버튼 문구 등 명확히 요청</li>
-<li><b>제한 조건</b> – 분량, 톤(존댓말), 금지 단어 등 명시</li>
-</ul>
-<p class="small">
-예) “SW 보안 세미나 개강 안내 메일 초안 써줘. 
-대상은 사내 개발자, 존댓말, 10줄 이내, 
-일정/장소/문의처는 {토큰}으로 남겨줘.”
-</p>
- </div>
- <div class="card">
-<h3>코파일럿 활용 예시</h3>
-<ul>
-<li>HTML 코드 구조 점검·정리</li>
-<li>반복 문구를 <b>토큰</b> 형태로 분리할 때 아이디어 받기</li>
-<li>Outlook/Forms에서 깨지는 부분 원인 확인</li>
-</ul>
-<div class="tip" style="margin-top:8px">
-“완성품 제작”이 아니라,<br>
-<b>초안 생성 + 검수 보조</b> 역할로 사용하고 있습니다.
-</div>
- </div>
-</div>
-</div>
-<div class="sno">12</div>
-</section>
+    <div class="deck" id="deck">
 
-<!-- 13. FAQ -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>FAQ</span>
-</div>
-<h2 class="reveal">FAQ</h2>
-<div class="grid-2b stagger">
- <div class="card">
-<h3>Q1. 코드를 몰라도 쓸 수 있나요?</h3>
-<p>
-A. 네. 기본 구조는 제가 세팅해 두고, 
-운영자는 <b>토큰 값(과정명/일시/장소)</b>만 입력하면 됩니다.
-</p>
-<h3 style="margin-top:12px">Q2. 오류 나면 어떻게 하나요?</h3>
-<p>
-A. 토큰 누락·오타는 발송 전 자동 체크하고, 
-템플릿 원본은 Teams에 보관해 <b>바로 롤백</b>이 가능합니다.
-</p>
- </div>
- <div class="card">
-<h3>Q3. 다른 본부에서도 바로 쓸 수 있나요?</h3>
-<p>
-A. 과목·브랜드만 바꾸면 되도록 설계했습니다. 
-필요 시 교육운영팀에서 <b>초기 세팅</b> 지원이 가능합니다.
-</p>
-<h3 style="margin-top:12px">Q4. 유지보수 부담은?</h3>
-<p>
-A. 외부 시스템이 아니라, 
-<b>MS365 + HTML 코드</b> 수준이라 비교적 가볍습니다. 
-템플릿을 한 번 수정하면 전체에 반영됩니다.
-</p>
- </div>
-</div>
-</div>
-<div class="sno">13</div>
-</section>
 
-<!-- 14. 결론 -->
-<section class="slide">
-<div class="topbar"></div>
-<div class="inner">
-<div class="section-tag reveal">
-<span class="section-tag-dot"></span>
-<span>Summary</span>
-</div>
-<h2 class="reveal">결론</h2>
-<p class="sub reveal">
-<b>운영의 품질 = 경험의 품질</b><br>
-작은 정리가 현장의 체감을 크게 바꿉니다.
-</p>
-<div class="keyline reveal">
-이번 파일럿의 결론은, <b>“반복되는 운영을 코드와 템플릿으로 정리하면 모두가 편해진다”</b> 입니다.
-</div>
-<div class="note reveal" style="margin-top:14px">
- <ol style="margin-left:16px; font-size:15px; line-height:1.8">
-<b>실행 포인트</b>
- </ol>
- <ol style="margin-left:16px; font-size:13px; line-height:1.8">
-<li>반복 업무를 줄이고, 표준 템플릿을 제공한다.</li>
-<li>사내 도구와 간단한 코드로 누구나 쓸 수 있게 만든다.</li>
-<li>업무 개선 경험을 팀 단위로 공유·확산한다.</li>
- </ol>
-</div>
-<p class="small reveal" style="margin-top:8px">팀 단위로 차근차근 확산을 시도해 보겠습니다.</p>
-</div>
-<div class="sno">14</div>
-</section>
 
-<!-- 15. 감사합니다 -->
-<section class="slide slide-thanks">
-<div class="topbar"></div>
-<div class="inner">
-<h2 class="reveal thanks-title">
-경청해 주셔서 감사합니다
-<span class="thanks-underline" aria-hidden="true"></span>
-</h2>
-<p class="sub reveal">
-Simple · Steady · Connected — 작지만 꾸준한 정리가 교육 경험의 품질을 만든다고 생각합니다.
-</p>
-<div class="tip reveal" style="margin-top:18px">
-오늘 공유드린 흐름을 바탕으로,<br>
-교육운영팀에서 더 많이 정리하고, 더 편하게 운영해 보겠습니다. 😊
-</div>
-<p class="small reveal" style="margin-top:14px">
-교육운영파트 김미진 드림
-</p>
-</div>
-<div class="sno">15</div>
-</section>
+      <!-- 1. 표지 -->
 
-</div>
+      <section class="slide slide--cover" data-section="Cover · Intro" data-section-short="Cover">
 
-<!-- Controls -->
-<div class="controls" aria-hidden="false">
- <div class="navbtns">
-<button class="ctrl" id="prevBtn" aria-label="이전 슬라이드">← 이전</button>
-<button class="ctrl" id="nextBtn" aria-label="다음 슬라이드">다음 →</button>
- </div>
- <div class="dots" id="dots" aria-label="슬라이드 이동 도트"></div>
-</div>
+        <div class="slide-inner">
 
-<div class="html-pill">
-<span class="code">&lt;/&gt;</span>
-<span class="label">HTML CODE DEMO</span>
-</div>
+          <div class="cover-label reveal">AI-ASSISTED EDUCATION OPERATION</div>
 
-<div class="hint">
-← / → 또는 클릭으로 슬라이드 이동
-</div>
+          <h1 class="cover-title reveal">AI로 구현한<br>스마트 교육운영</h1>
 
-<!-- 세미나 출결 운영자 설정 모달 (발표용) -->
-<div class="attend-admin-backdrop" id="adminModalAttend">
-  <div class="attend-admin-card">
-    <div class="attend-admin-title">운영자 설정</div>
-    <div class="attend-admin-sub">
-      이 브라우저에서 사용할 <strong>과정명, PIN 번호, 과정명 표시 여부</strong>를 설정합니다.<br>
-      (교육생은 이 설정 화면에 접근할 수 없습니다.)
+          <p class="cover-sub reveal">
+
+            Outlook · Teams · Forms · Power Automate 등<br>
+
+            <b>사내 MS 도구와 AI</b>만으로 실행해 본 교육운영 파일럿 정리
+
+          </p>
+
+          <div class="cover-meta reveal">
+
+            교육운영파트 김미진 사원<br>
+
+            2025-11-03
+
+          </div>
+
+          <div class="cover-keyline reveal">
+
+            <span class="label">TODAY'S FOCUS</span>
+
+            오늘은 <b>“실제 업무에 당장 쓸 수 있는 수준의 개선”</b>에만 집중해서 말씀드리겠습니다.
+
+          </div>
+
+          <div class="sno">1</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 2. 왜 지금, 왜 사내 도구인가? -->
+
+      <section class="slide" data-section="Context" data-section-short="Context">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>CONTEXT</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              배경 · 환경
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">왜 지금, 왜 사내 도구인가?</h2>
+
+            <div class="keyline reveal">
+
+              <b>외부 솔루션 없이</b>도, 지금 가진 MS 도구와 AI만으로 <b>운영 품질을 끌어올릴 수 있는지</b>를 검증한 파일럿입니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>기본 방향</h3>
+
+              <ul>
+
+                <li>보안·권한 검토 없이 바로 쓸 수 있는 방식</li>
+
+                <li>추가 라이선스/구매 없이 <b>MS365 중심</b> 구현</li>
+
+                <li>AI는 “관점/초안 제공자”로만 활용</li>
+
+              </ul>
+
+              <div class="note">
+
+                “새 시스템 도입”이 아니라, 현재 도구를 <b>조합·정리</b>하는 데 초점을 맞췄습니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>Why now?</h3>
+
+                <ul>
+
+                  <li>교육 안내·보고 메일을 연간 다수 수기 작성</li>
+
+                  <li>담당자·과정마다 서식·문체가 달라 검수 공수 증가</li>
+
+                  <li>해킹대회·세미나 확대 → 오류·누락 리스크 커짐</li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>사내 도구 중심 운영</h3>
+
+                <ul>
+
+                  <li>MS365 / Outlook / Teams / Forms / Power Automate 기반</li>
+
+                  <li>외부 AI·툴 없이도 운영 가능한 구조</li>
+
+                  <li>GitHub Copilot 등 사내 허용 AI로 보조 활용</li>
+
+                </ul>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">2</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 3. 현황 · 문제 인식 · 개선 목표 -->
+
+      <section class="slide" data-section="Problem & Goals" data-section-short="Problem">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>PROBLEM · GOAL</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              현황 · 운영원칙
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">현황 · 문제 인식 · 개선 목표</h2>
+
+            <div class="keyline reveal">
+
+              <b>“많이 바쁘지만, 늘 비슷한 일을 반복한다”</b>는 현장의 피로를 줄이는 것이 출발점이었습니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main layout-main--reverse">
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>추진 배경</h3>
+
+                <ul>
+
+                  <li>교육 안내·보고 문서 다수, 담당자별 형식 제각각</li>
+
+                  <li>형식 검수·수정에 건당 20~30분 추가</li>
+
+                  <li>대규모 행사 시 오류·재작성 공수 발생</li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>현장의 문제 인식</h3>
+
+                <ul>
+
+                  <li>과정명·일시·장소 매번 재입력 → 복붙 오타</li>
+
+                  <li>폰트·여백·문체 불일치로 가독성 저하</li>
+
+                  <li>출석·결과·보고 흐름이 끊겨 재작성 반복</li>
+
+                </ul>
+
+              </div>
+
+            </div>
+
+            <div class="col-summary reveal">
+
+              <h3>개선 목표 (운영 원칙)</h3>
+
+              <ul>
+
+                <li><b>단순 Simple</b> – 한 번 입력해 여러 단계 활용</li>
+
+                <li><b>일정 Steady</b> – 서식·문체 기준 통일</li>
+
+                <li><b>연결 Connected</b> – 공지→출석→보고 흐름 유지</li>
+
+              </ul>
+
+              <div class="tip">
+
+                이번 파일럿은 이 세 가지 원칙을 <b>실제 업무</b>에 적용해 본 첫 시도입니다.
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">3</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 4. 이번에 직접 개선한 3가지 -->
+
+      <section class="slide" data-section="Overview" data-section-short="Overview">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>OVERVIEW</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              전체 구조
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">이번에 직접 개선한 3가지</h2>
+
+            <div class="keyline reveal">
+
+              오늘 데모는 <b>“메일 템플릿 · 안내 사이트 · PIN 출석”</b> 세 가지 개선 흐름으로 보시면 됩니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>한 줄로 요약하면</h3>
+
+              <ul>
+
+                <li>공지 메일: <b>HTML 템플릿</b>으로 통일</li>
+
+                <li>개강 안내: <b>웹·메일 한 번에</b> 관리</li>
+
+                <li>세미나 출석: <b>PIN + 자동 기록</b> 구조</li>
+
+              </ul>
+
+              <div class="note">
+
+                세 가지 모두 <b>한 번 입력한 정보가 여러 단계</b>에 재사용되도록 설계했습니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>① HTML 템플릿 (메일·인쇄)</h3>
+
+                <ul>
+
+                  <li>공지 메일·인쇄물을 <b>단일 HTML</b> 템플릿으로 생성</li>
+
+                  <li>Outlook·EP 메일 호환, 레이아웃 깨짐 최소화</li>
+
+                  <li>운영 원칙: <b>단순 · 일정</b></li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>② 개강 안내 사이트</h3>
+
+                <ul>
+
+                  <li>기존 안내문을 <b>웹 페이지</b>로 전환</li>
+
+                  <li>외부 강사·내부 구성원이 같은 정보 기준 사용</li>
+
+                  <li>운영 원칙: <b>일정 · 연결</b></li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>③ PIN 기반 세미나 출석</h3>
+
+                <ul>
+
+                  <li>Class별 PIN 코드로 공용 PC에서 출석 입력</li>
+
+                  <li>MS 연동으로 출석 시간·명단 자동 기록</li>
+
+                  <li>운영 원칙: <b>단순 · 연결</b></li>
+
+                </ul>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">4</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 5. 개선 1 – HTML 템플릿 -->
+
+      <section class="slide" data-section="Demo 1 · HTML" data-section-short="Demo 1">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>DEMO 1 · HTML TEMPLATE</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              메일/인쇄 안내
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">개선 1 – HTML 템플릿 (메일·인쇄)</h2>
+
+            <div class="keyline reveal">
+
+              <b>“메일·인쇄물은 템플릿 1종으로 통일”</b> → 작성 시간은 줄이고, 품질은 일정하게.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>Before · 수기 메일/이미지</h3>
+
+              <ul>
+
+                <li>과정마다 Word/PowerPoint 양식을 새로 작성</li>
+
+                <li>EP·Outlook에서 이미지·줄바꿈 깨짐</li>
+
+                <li>작성+검수 포함 1건당 약 35분 소요</li>
+
+              </ul>
+
+              <div class="risk">
+
+                담당자·과정이 바뀔 때마다 <b>처음부터 다시 만드는 느낌</b>이 반복되었습니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="card reveal">
+
+                <h3>After · HTML 템플릿 1종 통일</h3>
+
+                <div class="mock">
+
+                  <img src="images/mail_template_sample.png" alt="HTML 메일 템플릿 예시">
+
+                </div>
+
+                <ul style="margin-top:6px">
+
+                  <li>과정명·일시만 입력하면 안내문이 <b>자동 생성</b></li>
+
+                  <li>버튼·색상·폰트 통일 → 운영 품질 일정화</li>
+
+                  <li>제작 시간 약 7분, 약 80% 단축</li>
+
+                </ul>
+
+                <p class="small">
+
+                  ※ 이미지는 <code>images/mail_template_sample.png</code>를 실제 캡처로 교체해 사용합니다.
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">5</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 6. 개선 2 – 개강 안내 사이트 (개요) -->
+
+      <section class="slide" data-section="Demo 2 · Opening" data-section-short="Demo 2">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>DEMO 2 · OPENING SITE</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              개강 안내 구조
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">개강 안내 사이트 – 개요</h2>
+
+            <div class="keyline reveal">
+
+              <b>핵심 안내는 “메일 + 웹 한 페이지”로</b> → 강사·교육생 모두 같은 화면을 봅니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>역할</h3>
+
+              <ul>
+
+                <li>Magok Lecture Guide 등 방문·개강 정보를 한 화면에 정리</li>
+
+                <li>외부 강사·내부 구성원이 동일한 정보 기준 사용</li>
+
+                <li>메일 안내문에서 <b>링크 한 번</b>으로 바로 접속</li>
+
+              </ul>
+
+              <div class="note" style="margin-top:6px">
+
+                데모에서는 <b>개강 안내 사이트만</b> 브라우저 링크로 직접 접속해 보여드립니다.
+
+              </div>
+
+              <p class="small" style="margin-top:6px">
+
+                (운영 URL 예시) 
+
+                <a class="en" href="https://example.com/magok-lecture-guide" target="_blank">
+
+                  https://example.com/magok-lecture-guide
+
+                </a><br>
+
+                ※ 발표 전 실제 사내 URL로 교체.
+
+              </p>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="card reveal">
+
+                <h3>화면 예시</h3>
+
+                <div class="mock">
+
+                  <img src="images/lecture_guide_sample.png" alt="개강 안내 사이트 예시">
+
+                </div>
+
+                <p class="small">
+
+                  방문 절차, 주차, 출입 등을 <b>한 페이지</b>로 통합해
+
+                  “메일 + 웹” 조합으로 안내합니다.
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">6</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 6-1. 개강 안내 Live Demo -->
+
+      <section class="slide" data-section="Demo 2 · Live" data-section-short="Opening · Live">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>DEMO 2 · LIVE</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              개강 안내 · 메일 연결
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">개강 안내 사이트 – 라이브 데모</h2>
+
+            <p class="sub reveal">
+
+              실제 운영 화면처럼 <b>과정 정보와 방문 안내</b>를 한 번에 보여주고,<br>
+
+              같은 값이 <b>안내 메일 본문</b>에 어떻게 들어가는지까지 이어서 보여드립니다.
+
+            </p>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-detail">
+
+              <div class="guide-shell reveal">
+
+                <div class="guide-card">
+
+                  <div class="guide-header">
+
+                    <div>
+
+                      <div class="guide-eyebrow">OPENING GUIDE</div>
+
+                      <div class="guide-title">LG Science Park 개강 안내</div>
+
+                    </div>
+
+                    <div class="guide-chip">과정명: AI 세미나</div>
+
+                  </div>
+
+
+
+                  <p class="guide-subtitle">
+
+                    아래 정보가 개강안내 사이트와 메일에 <strong>동일한 값</strong>으로 사용됩니다.
+
+                    (데모에서는 별도 브라우저 탭으로 전체 페이지를 보여드립니다.)
+
+                  </p>
+
+
+
+                  <div class="guide-meta-grid">
+
+                    <div class="guide-block">
+
+                      <div class="guide-block-title">강의 기본정보</div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">과정명</div>
+
+                        <div class="guide-value">AI 세미나</div>
+
+                      </div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">일시</div>
+
+                        <div class="guide-value">2025.11.18 (화) 13:30–17:30</div>
+
+                      </div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">장소</div>
+
+                        <div class="guide-value">LG사이언스파크 C동 3층 Vision Hall</div>
+
+                      </div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">대상</div>
+
+                        <div class="guide-value">사내 개발자 · 보안담당자</div>
+
+                      </div>
+
+                    </div>
+
+
+
+                    <div class="guide-block">
+
+                      <div class="guide-block-title">방문/문의 안내</div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">출입 절차</div>
+
+                        <div class="guide-value">방문포털 사전등록 + 1F 방문증 수령</div>
+
+                      </div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">주차</div>
+
+                        <div class="guide-value">W10동 지하1층, 방문자 차량 사전등록</div>
+
+                      </div>
+
+                      <div class="guide-row">
+
+                        <div class="guide-label">담당자</div>
+
+                        <div class="guide-value">교육운영파트 김미진 (내선 7477)</div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+
+
+                  <div class="guide-footer">
+
+                    <div class="guide-btns">
+
+                      <a class="guide-btn secondary" href="https://example.com/magok-lecture-guide" target="_blank">
+
+                        <span class="icon">🌐</span> 개강안내 실제 페이지 열기
+
+                      </a>
+
+                      <button type="button" class="guide-btn" id="guideToggleResult">
+
+                        <span class="icon">✉️</span> 메일 본문 예시 보기
+
+                      </button>
+
+                    </div>
+
+                    <div class="guide-note">
+
+                      ※ 실제 운영 시에는 같은 값이<br>EP 메일 · 안내 사이트 · PDF 모두에 공통으로 사용됩니다.
+
+                    </div>
+
+                  </div>
+
+
+
+                  <div class="guide-result" id="guideResultBox">
+
+[AI 세미나 개강 안내]
+
+
+
+안녕하세요, 교육운영파트입니다.
+
+
+
+아래 일정으로 「AI 세미나」가 진행됩니다. 사전 방문등록 및 출입 절차를 미리 확인 부탁드립니다.
+
+
+
+- 과정명 : AI 세미나
+
+- 일시   : 2025.11.18 (화) 13:30–17:30
+
+- 장소   : LG사이언스파크 C동 3층 Vision Hall
+
+- 대상   : 사내 개발자 · 보안담당자
+
+
+
+[방문/출입 안내]
+
+- 방문포털에서 사전 출입 등록 후, 당일 1층 방문증을 수령해 주십시오.
+
+- 주차가 필요한 경우, W10동 지하1층 방문자 주차장을 이용해 주십시오.
+
+  (차량 번호는 사전에 담당자에게 전달해 주시면 됩니다.)
+
+
+
+궁금하신 사항은 교육운영파트 김미진(내선 7477)에게 문의해 주세요.
+
+감사합니다.
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="col-summary reveal">
+
+              <h3>데모 포인트</h3>
+
+              <ul>
+
+                <li>과정명/일시/장소를 <b>한 곳에서만 변경</b></li>
+
+                <li>변경 즉시, 메일·웹·PDF에 동일하게 반영</li>
+
+                <li>운영자는 “내용 검토”에 집중, 형식은 템플릿이 담당</li>
+
+              </ul>
+
+              <div class="tip">
+
+                발표 시에는 <b>실제 브라우저</b>에서 안내 페이지를 열어 동작을 보여드립니다.
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">6·Live</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 7. 개선 3 – 세미나 출석 (설명) -->
+
+      <section class="slide" data-section="Demo 3 · Attendance" data-section-short="Demo 3">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>DEMO 3 · ATTENDANCE</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              출석 흐름
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">개선 3 – 세미나 출석 흐름</h2>
+
+            <div class="keyline reveal">
+
+              <b>종이 서명 대신 “PIN + 자동 기록”</b> → 출석 누락과 수기 정리를 한 번에 줄였습니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>운영 관점의 변화</h3>
+
+              <ul>
+
+                <li>“출석표 회수 → 엑셀 입력” 루틴 제거</li>
+
+                <li>출석 시간/인원/세션별 참여율이 자동 남음</li>
+
+                <li>재작성/재확인에 쓰던 시간을 <b>피드백 정리</b>로 전환</li>
+
+              </ul>
+
+              <div class="tip">
+
+                출석만 자동화한 것이 아니라, <b>운영 흐름 전체</b>를 정리한 것이 포인트입니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>Before · 종이 출석</h3>
+
+                <ul>
+
+                  <li>종이에 서명, 필기체·누락으로 재확인 필요</li>
+
+                  <li>명단과 수기로 대조하며 인원 체크</li>
+
+                  <li>출석 정리·입력에 추가 공수 발생</li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>After · PIN 출석</h3>
+
+                <ul>
+
+                  <li>Class별 PIN을 공용 PC에서 입력</li>
+
+                  <li>MS 연동으로 출석 시간·명단 자동 기록</li>
+
+                  <li>출석 누락 0건, 수기 정리 공수 감소</li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>시연 방식</h3>
+
+                <ul>
+
+                  <li>실제 운영 화면을 공용 PC 2대로 녹화</li>
+
+                  <li>발표 시에는 링크 접속 없이 <b>영상</b>으로 흐름 시연</li>
+
+                  <li>“이전 불편 → 개선 화면”이 한눈에 보이도록 구성</li>
+
+                </ul>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">7</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 7-1. 세미나 출결 Live Demo -->
+
+      <section class="slide" data-section="Demo 3 · Live" data-section-short="Attendance · Live">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>DEMO 3 · LIVE</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              출결 입력 화면
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">세미나 출결 – 라이브 데모</h2>
+
+            <p class="sub reveal">
+
+              실제처럼 이름 · 사번 · PIN을 입력해 보고,<br>
+
+              Power Automate로 출석 데이터가 넘어가는 흐름을 바로 보여드립니다.
+
+            </p>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-detail">
+
+              <div class="attend-shell reveal">
+
+                <div class="attend-card">
+
+                  <div class="attend-header">
+
+                    <div class="attend-title-wrap" id="attendTitleWrap">
+
+                      <div class="attend-eyebrow">SEMINAR ATTENDANCE</div>
+
+                      <div class="attend-title" id="attendPageTitle">세미나 출결</div>
+
+                    </div>
+
+                    <div class="attend-badge" id="attendCourseBadge">과정명: 리스크 관리</div>
+
+                  </div>
+
+
+
+                  <p class="attend-subtitle">
+
+                    아래 정보를 입력 후 <strong>출석 체크</strong>를 눌러 주세요.<br>
+
+                    PIN 번호가 일치하면 출석이 자동 기록됩니다.
+
+                  </p>
+
+
+
+                  <form id="attendanceForm" class="attend-form">
+
+                    <div class="attend-field">
+
+                      <div class="attend-label-row">
+
+                        <label class="attend-label" for="attendName">이름</label>
+
+                      </div>
+
+                      <input id="attendName" required placeholder="예) 홍길동">
+
+                    </div>
+
+                    <div class="attend-field">
+
+                      <div class="attend-label-row">
+
+                        <label class="attend-label" for="attendEmpId">사번</label>
+
+                      </div>
+
+                      <input id="attendEmpId" required placeholder="예) 12345678">
+
+                    </div>
+
+                    <div class="attend-field">
+
+                      <div class="attend-label-row">
+
+                        <label class="attend-label" for="attendPin">PIN 번호</label>
+
+                        <span class="attend-hint">운영자가 안내한 6자리</span>
+
+                      </div>
+
+                      <input id="attendPin" type="password" maxlength="6"
+
+                             class="attend-pin-input" required placeholder="••••••">
+
+                    </div>
+
+
+
+                    <button type="submit" id="attendSubmitBtn">출석 체크</button>
+
+                    <div class="attend-status" id="attendStatusMsg"></div>
+
+                  </form>
+
+
+
+                  <div class="attend-footer">
+
+                    ※ 데모용 화면입니다. 실제 운영 시에는 조직 정책에 맞춰 Power Automate URL을 설정합니다.
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="col-summary reveal">
+
+              <h3>운영자 옵션 (발표용)</h3>
+
+              <ul>
+
+                <li>제목 영역을 <b>3번 클릭</b>하면 운영자 설정 열림</li>
+
+                <li>과정명 · PIN · 과정명 표시 여부를 브라우저별로 저장</li>
+
+                <li>현재 브라우저에만 적용 → 데모 시 안전하게 변경 가능</li>
+
+              </ul>
+
+              <div class="note">
+
+                실제 운영에서는 Power Automate 엔드포인트만 교체하면,<br>
+
+                동일한 화면으로 바로 출석 수집이 가능합니다.
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">7·Live</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 8. 토큰 & CSV -->
+
+      <section class="slide" data-section="Structure · Token" data-section-short="Token">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>STRUCTURE</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              토큰 설계
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">토큰 & CSV 기반 구조</h2>
+
+            <div class="keyline reveal">
+
+              <b>“한 번만 정확히 입력하고, 나머지는 코드가 대신”</b>하는 구조로 바꿨습니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>설계 원칙</h3>
+
+              <ul>
+
+                <li>문장 안에 값이 여러 번 등장해도 <b>토큰 1개</b>로 관리</li>
+
+                <li>CSV·양식에서 받은 값을 그대로 연결</li>
+
+                <li>누락/오타는 발송 전 <b>자동 체크</b></li>
+
+              </ul>
+
+              <div class="tip">
+
+                토큰 규칙을 한 번만 정의해 두면,<br>
+
+                다른 교육에서도 거의 그대로 재사용이 가능합니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="table-wrap reveal">
+
+                <table class="table">
+
+                  <tr><th>토큰</th><th>설명</th><th>예시</th><th>규칙</th></tr>
+
+                  <tr><td>{과정명}</td><td>교육 명칭</td><td>SW Security 101</td><td>고정 명칭</td></tr>
+
+                  <tr><td>{일시}</td><td>교육 일시</td><td>2025-11-18 09:00</td><td>YYYY-MM-DD HH:MM</td></tr>
+
+                  <tr><td>{장소}</td><td>교육장</td><td>ISC Vision Hall</td><td>사내 약칭</td></tr>
+
+                  <tr><td>{강사}</td><td>강사명</td><td>홍길동</td><td>선택</td></tr>
+
+                  <tr><td>{문의처}</td><td>담당 연락처</td><td>교육운영 1234</td><td>필수</td></tr>
+
+                </table>
+
+              </div>
+
+              <div class="note reveal">
+
+                <ul>
+
+                  <li>CSV 업로드로 명단을 만들고, 토큰에 <b>한 번만</b> 값을 넣습니다.</li>
+
+                  <li>토큰 누락·오타는 발송 전 자동 감지해 <b>오류 메일</b>을 차단합니다.</li>
+
+                </ul>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">8</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 9. 성과 요약 -->
+
+      <section class="slide" data-section="Impact" data-section-short="Impact">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>IMPACT</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              정량·정성 결과
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">성과 요약</h2>
+
+            <div class="keyline reveal">
+
+              핵심은 <b>“시간 80% 절감 + 오류 0건”</b>, 그리고 교육 경험의 체감 품질 상승입니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>정리</h3>
+
+              <ul>
+
+                <li>반복 작업 공수 ↓, 기획/소통 공수 ↑</li>
+
+                <li>출석·안내 혼선 감소 → 경험 품질 ↑</li>
+
+                <li>운영 데이터가 남으면서, <b>다음 기획</b>이 쉬워짐</li>
+
+              </ul>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="table-wrap reveal">
+
+                <table class="table">
+
+                  <tr><th>항목</th><th>Before</th><th>After</th><th>변화</th></tr>
+
+                  <tr><td>제작 시간</td><td>35분</td><td><b>7분</b></td><td><b>-80%</b></td></tr>
+
+                  <tr><td>서식 오류</td><td>월 7건</td><td><b>0건</b></td><td>해결</td></tr>
+
+                  <tr><td>문의</td><td>주 10건</td><td>7건</td><td>-30%</td></tr>
+
+                  <tr><td>만족도</td><td>68점</td><td><b>93점</b></td><td>+25pt</td></tr>
+
+                </table>
+
+              </div>
+
+              <div class="layout-main" style="margin-top:10px; grid-template-columns:repeat(3,1fr); gap:10px;">
+
+                <div class="card">
+
+                  <h3>운영자</h3>
+
+                  <p>반복 작업 ↓, 기획·소통에 쓰는 시간 ↑</p>
+
+                </div>
+
+                <div class="card">
+
+                  <h3>강사</h3>
+
+                  <p>일관된 안내문으로 사전 준비·문의가 명확</p>
+
+                </div>
+
+                <div class="card">
+
+                  <h3>교육생</h3>
+
+                  <p>출석·안내 혼선 감소, 경험 만족도 상승</p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">9</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 10. 기능 활용성 -->
+
+      <section class="slide" data-section="Extension" data-section-short="Extension">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>EXTENSION</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              확장 가능성
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">기능 활용성</h2>
+
+            <div class="keyline reveal">
+
+              <b>“새 시스템 도입”이 아니라,</b> 지금 있는 문서·코드를 <b>같이 쓰기 좋게 정리한 것</b>에 가깝습니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>조직별 활용 방안</h3>
+
+              <ul>
+
+                <li>공통 템플릿 세트 → 본부별 맞춤 수정</li>
+
+                <li>Teams 채널로 HTML 코드·샘플·Tip 공유</li>
+
+                <li>정기 공지/보고 일정 알림 + 양식 링크 제공</li>
+
+              </ul>
+
+              <div class="tip">
+
+                새 시스템이 아니라, <b>함께 쓰는 문서·코드</b>를 정리한 결과물에 가깝습니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>협업 부서</h3>
+
+                <ul>
+
+                  <li>기획팀: 보고 항목·지표 정의</li>
+
+                  <li>HRD: 일정표·출석 절차 개선</li>
+
+                  <li>인재육성: 양식 통합 제안 및 사내 확산</li>
+
+                </ul>
+
+              </div>
+
+              <div class="card">
+
+                <h3>확장 아이디어</h3>
+
+                <ul>
+
+                  <li>정기 세미나·교육을 위한 공통 “운영 킷” 제작</li>
+
+                  <li>사내 교육 포털과 연동해 자동 등록/리마인드</li>
+
+                  <li>분기별 베스트 사례 공유 세션 운영</li>
+
+                </ul>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">10</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 11. 향후 계획 -->
+
+      <section class="slide" data-section="Next Step" data-section-short="Next Step">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>NEXT STEP</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              디벨롭 방향
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">향후 계획</h2>
+
+            <div class="keyline reveal">
+
+              파일럿에서 끝이 아니라, <b>“세미나 출결 · 안내 사이트” 두 축으로 계속 확장</b>해 볼 계획입니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>내부 To-do</h3>
+
+              <ul>
+
+                <li>① 세미나 출결 MS 연동 완성</li>
+
+                <li>② 개강 안내/확정 사이트 고도화</li>
+
+              </ul>
+
+              <div class="note">
+
+                두 축을 꾸준히 정리하면서,<br>
+
+                “운영 데이터가 자연스럽게 쌓이는 구조”까지 보는 것이 목표입니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="table-wrap reveal">
+
+                <table class="table">
+
+                  <tr><th>현재 구현</th><th>향후 디벨롭 방향</th></tr>
+
+                  <tr>
+
+                    <td>PIN 기반 출석 사이트</td>
+
+                    <td>
+
+                      MS 계정 연동으로 출석 기록 자동화 안정화<br>
+
+                      타 조직도 활용할 수 있도록 운영 매뉴얼·예시 화면 정리
+
+                    </td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td>외부 강사 정보 입력 + Email 자동 메일링</td>
+
+                    <td>
+
+                      MS 환경과 연동해 데이터 자동 축적 보완<br>
+
+                      다른 교육에서도 바로 쓸 수 있는 <b>정형 템플릿</b>으로 배포
+
+                    </td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td>HTML 메일 템플릿</td>
+
+                    <td>
+
+                      HTML 활용 스터디 진행<br>
+
+                      다수가 직접 수정·재사용할 수 있도록 사례 공유
+
+                    </td>
+
+                  </tr>
+
+                  <tr>
+
+                    <td>CSV 업로드 기반 명단 생성</td>
+
+                    <td>
+
+                      실시간 데이터 분석 → 보고 자동화·시각화 샘플 생성<br>
+
+                      반복 보고 포맷을 HTML/Excel 템플릿으로 정리
+
+                    </td>
+
+                  </tr>
+
+                </table>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">11</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 12. 프롬프트 & 코파일럿 활용 팁 -->
+
+      <section class="slide" data-section="How-to · AI" data-section-short="AI Tips">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>HOW-TO · AI</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              프롬프트 활용
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">프롬프트 & 코파일럿 활용 팁</h2>
+
+            <div class="keyline reveal">
+
+              AI는 <b>“완성품”이 아니라 “초안 + 검수 보조”</b>로 쓸 때, 운영 품질이 가장 안전했습니다.
+
+            </div>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>프롬프트 작성 3원칙</h3>
+
+              <ul>
+
+                <li><b>맥락 먼저</b> – “교육 안내 메일 초안, 대상: 내부 임직원”</li>
+
+                <li><b>형식 지정</b> – 제목/본문/버튼 문구 등 명확히 요청</li>
+
+                <li><b>제한 조건</b> – 분량, 톤(존댓말), 금지 단어 등 명시</li>
+
+              </ul>
+
+              <p class="small">
+
+                예) “SW 보안 세미나 개강 안내 메일 초안 써줘. 대상은 사내 개발자, 존댓말, 10줄 이내, 일정/장소/문의처는 {토큰}으로 남겨줘.”
+
+              </p>
+
+            </div>
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>코파일럿 활용 예시</h3>
+
+                <ul>
+
+                  <li>HTML 코드 구조 점검·정리</li>
+
+                  <li>반복 문구를 <b>토큰</b> 형태로 분리할 때 아이디어 받기</li>
+
+                  <li>Outlook/Forms에서 깨지는 부분 원인 확인</li>
+
+                </ul>
+
+              </div>
+
+              <div class="tip">
+
+                “완성품 제작”이 아니라,<br>
+
+                <b>초안 생성 + 검수 보조</b> 역할로 사용하고 있습니다.
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">12</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 13. FAQ -->
+
+      <section class="slide" data-section="FAQ" data-section-short="FAQ">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>FAQ</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              자주 나오는 질문
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">FAQ</h2>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>요약</h3>
+
+              <ul>
+
+                <li>코드를 몰라도 <b>토큰만 작성하면 사용 가능</b></li>
+
+                <li>오류 시에는 롤백·자동 체크 기능으로 대응</li>
+
+                <li>다른 본부도 브랜드만 바꿔 바로 적용 가능</li>
+
+              </ul>
+
+            </div>
+
+            <div class="col-detail stagger">
+
+              <div class="card">
+
+                <h3>Q1. 코드를 몰라도 쓸 수 있나요?</h3>
+
+                <p>
+
+                  A. 네. 기본 구조는 제가 세팅해 두고, 
+
+                  운영자는 <b>토큰 값(과정명/일시/장소)</b>만 입력하면 됩니다.
+
+                </p>
+
+                <h3 style="margin-top:10px">Q2. 오류 나면 어떻게 하나요?</h3>
+
+                <p>
+
+                  A. 토큰 누락·오타는 발송 전 자동 체크하고, 
+
+                  템플릿 원본은 Teams에 보관해 <b>바로 롤백</b>이 가능합니다.
+
+                </p>
+
+              </div>
+
+              <div class="card">
+
+                <h3>Q3. 다른 본부에서도 바로 쓸 수 있나요?</h3>
+
+                <p>
+
+                  A. 과목·브랜드만 바꾸면 되도록 설계했습니다. 
+
+                  필요 시 교육운영팀에서 <b>초기 세팅</b> 지원이 가능합니다.
+
+                </p>
+
+                <h3 style="margin-top:10px">Q4. 유지보수 부담은?</h3>
+
+                <p>
+
+                  A. 외부 시스템이 아니라, 
+
+                  <b>MS365 + HTML 코드</b> 수준이라 비교적 가볍습니다. 
+
+                  템플릿을 한 번 수정하면 전체에 반영됩니다.
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <div class="sno">13</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 14. 결론 -->
+
+      <section class="slide" data-section="Summary" data-section-short="Summary">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>SUMMARY</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              정리
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal">결론</h2>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <h3>메시지</h3>
+
+              <p class="sub">
+
+                <b>운영의 품질 = 경험의 품질</b><br>
+
+                작은 정리가 현장의 체감을 크게 바꿉니다.
+
+              </p>
+
+              <div class="keyline" style="margin-top:8px">
+
+                이번 파일럿의 결론은, <b>“반복되는 운영을 코드와 템플릿으로 정리하면 모두가 편해진다”</b> 입니다.
+
+              </div>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="note reveal">
+
+                <ol style="margin-left:16px; font-size:14px; line-height:1.7">
+
+                  <b>실행 포인트</b>
+
+                </ol>
+
+                <ol style="margin-left:16px; font-size:13px; line-height:1.7">
+
+                  <li>반복 업무를 줄이고, 표준 템플릿을 제공한다.</li>
+
+                  <li>사내 도구와 간단한 코드로 누구나 쓸 수 있게 만든다.</li>
+
+                  <li>업무 개선 경험을 팀 단위로 공유·확산한다.</li>
+
+                </ol>
+
+              </div>
+
+              <p class="small reveal" style="margin-top:8px">
+
+                팀 단위로 차근차근 확산을 시도해 보겠습니다.
+
+              </p>
+
+            </div>
+
+          </div>
+
+          <div class="sno">14</div>
+
+        </div>
+
+      </section>
+
+
+
+      <!-- 15. 감사합니다 -->
+
+      <section class="slide" data-section="Closing" data-section-short="Closing">
+
+        <div class="slide-inner">
+
+          <div class="slide-topline">
+
+            <div class="section-tag reveal">
+
+              <span class="section-tag-dot"></span>
+
+              <span>CLOSING</span>
+
+            </div>
+
+            <div class="slide-meta reveal">
+
+              마무리
+
+            </div>
+
+          </div>
+
+          <div class="slide-header">
+
+            <h2 class="reveal thanks-title">경청해 주셔서 감사합니다</h2>
+
+          </div>
+
+          <div class="layout-main">
+
+            <div class="col-summary reveal">
+
+              <p class="sub thanks-sub">
+
+                Simple · Steady · Connected — 작지만 꾸준한 정리가<br>
+
+                교육 경험의 품질을 만든다고 생각합니다.
+
+              </p>
+
+            </div>
+
+            <div class="col-detail">
+
+              <div class="tip reveal">
+
+                오늘 공유드린 흐름을 바탕으로,<br>
+
+                교육운영팀에서 더 많이 정리하고, 더 편하게 운영해 보겠습니다. 😊
+
+              </div>
+
+              <p class="small reveal" style="margin-top:12px">
+
+                교육운영파트 김미진 드림
+
+              </p>
+
+              <p class="small reveal" style="margin-top:6px">
+
+                (발표 팁) F 키를 누르면 <b>포커스 모드</b>로 헤더/풋터가 숨겨져,
+
+                실제 발표 화면을 더 크게 사용하실 수 있습니다.
+
+              </p>
+
+            </div>
+
+          </div>
+
+          <div class="sno">15</div>
+
+        </div>
+
+      </section>
+
+
+
     </div>
 
-    <div class="attend-field" style="margin-bottom:10px;">
-      <label class="attend-label" for="adminCourseNameAttend">과정명</label>
-      <input id="adminCourseNameAttend" type="text" placeholder="예: 리스크 관리">
+  </main>
+
+
+
+  <!-- 하단 컨트롤 -->
+
+  <footer class="app-footer">
+
+    <div>← / → : 슬라이드 이동 · F : 포커스 모드</div>
+
+    <div class="controls" aria-hidden="false">
+
+      <div class="navbtns">
+
+        <button class="ctrl" id="prevBtn" aria-label="이전 슬라이드">← 이전</button>
+
+        <button class="ctrl" id="nextBtn" aria-label="다음 슬라이드">다음 →</button>
+
+      </div>
+
+      <div class="dots" id="dots" aria-label="슬라이드 이동 도트"></div>
+
     </div>
 
-    <div class="attend-field" style="margin-bottom:6px;">
-      <label class="attend-label" for="adminPinAttend">PIN 번호 (4~6자리 숫자)</label>
-      <input id="adminPinAttend" type="text" maxlength="6" class="attend-pin-input" placeholder="예: 123456">
+  </footer>
+
+
+
+  <!-- 세미나 출결 운영자 설정 모달 -->
+
+  <div class="attend-admin-backdrop" id="adminModalAttend">
+
+    <div class="attend-admin-card">
+
+      <div class="attend-admin-title">운영자 설정</div>
+
+      <div class="attend-admin-sub">
+
+        이 브라우저에서 사용할 <strong>과정명, PIN 번호, 과정명 표시 여부</strong>를 설정합니다.<br>
+
+        (교육생은 이 설정 화면에 접근할 수 없습니다.)
+
+      </div>
+
+
+
+      <div class="attend-field" style="margin-bottom:6px;">
+
+        <label class="attend-label" for="adminCourseNameAttend">과정명</label>
+
+        <input id="adminCourseNameAttend" type="text" placeholder="예: 리스크 관리">
+
+      </div>
+
+
+
+      <div class="attend-field" style="margin-bottom:4px;">
+
+        <label class="attend-label" for="adminPinAttend">PIN 번호 (4~6자리 숫자)</label>
+
+        <input id="adminPinAttend" type="text" maxlength="6" class="attend-pin-input" placeholder="예: 123456">
+
+      </div>
+
+
+
+      <div class="attend-admin-check">
+
+        <input type="checkbox" id="adminShowCourseAttend">
+
+        <label for="adminShowCourseAttend">교육생 화면에 과정명 표시</label>
+
+      </div>
+
+
+
+      <div class="attend-admin-actions">
+
+        <button type="button" class="attend-btn-secondary" id="adminCancelAttend">취소</button>
+
+        <button type="button" id="adminSaveAttend">저장</button>
+
+      </div>
+
     </div>
 
-    <div class="attend-admin-check">
-      <input type="checkbox" id="adminShowCourseAttend">
-      <label for="adminShowCourseAttend">교육생 화면에 과정명 표시</label>
-    </div>
-
-    <div class="attend-admin-actions">
-      <button type="button" class="attend-btn-secondary" id="adminCancelAttend">취소</button>
-      <button type="button" id="adminSaveAttend">저장</button>
-    </div>
   </div>
-</div>
+
+
 
 </div>
-
 <script>
-/* 로고 자동 삽입 */
+
+/* 슬라이드 내비 & 애니메이션 & 섹션 헤더 업데이트 */
+
 (function(){
-const logoSrc = 'https://raw.githubusercontent.com/Edulorix/any/main/발표장료/biztechon_logo.png';
-document.querySelectorAll('.slide').forEach(slide=>{
-if(slide.querySelector('.logo-biztechon')) return;
-const img=document.createElement('img');
-img.src=logoSrc;
-img.alt='BizTechON';
-img.className='logo-biztechon';
-slide.appendChild(img);
-});
+
+  const deck = document.getElementById('deck');
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+
+  const total = slides.length;
+
+  let current = 0;
+
+
+
+  const dotsWrap = document.getElementById('dots');
+
+  const progressInner = document.getElementById('progressInner');
+
+  const headerPageInfo = document.getElementById('headerPageInfo');
+
+  const headerSectionLabel = document.getElementById('headerSectionLabel');
+
+  const headerSectionShort = document.getElementById('headerSectionShort');
+
+
+
+  const dots = slides.map((_,i)=>{
+
+    const d=document.createElement('div');
+
+    d.className='dot';
+
+    d.dataset.i=i;
+
+    d.addEventListener('click', ()=>show(i));
+
+    dotsWrap.appendChild(d);
+
+    return d;
+
+  });
+
+
+
+  function updateDots(){
+
+    dots.forEach((d,i)=>d.classList.toggle('active', i===current));
+
+  }
+
+
+
+  function updateProgress(){
+
+    if(!progressInner) return;
+
+    const ratio = (current+1)/total;
+
+    progressInner.style.width = (ratio*100) + '%';
+
+  }
+
+
+
+  function updateHeader(){
+
+    if(headerPageInfo){
+
+      headerPageInfo.textContent = (current+1) + ' / ' + total;
+
+    }
+
+    const slide = slides[current];
+
+    const secFull = slide.getAttribute('data-section') || '교육운영 파일럿 · HTML 템플릿 · 개강 안내 · PIN 출석';
+
+    const secShort = slide.getAttribute('data-section-short') || 'Slide';
+
+    if(headerSectionLabel) headerSectionLabel.textContent = secFull;
+
+    if(headerSectionShort) headerSectionShort.textContent = secShort;
+
+  }
+
+
+
+  function playReveal(slideEl){
+
+    slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.remove('show'));
+
+    slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.remove('show'));
+
+    requestAnimationFrame(()=>{
+
+      requestAnimationFrame(()=>{
+
+        slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.add('show'));
+
+        slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.add('show'));
+
+      });
+
+    });
+
+  }
+
+
+
+  // 👉 transform 대신 display로만 전환 (오류 줄이기)
+
+  function show(idx){
+
+    if(idx<0) idx=0;
+
+    if(idx>=total) idx=total-1;
+
+    current = idx;
+
+
+
+    slides.forEach((s,i)=>{
+
+      s.style.display = (i===current ? 'block' : 'none');
+
+    });
+
+
+
+    updateDots();
+
+    updateProgress();
+
+    updateHeader();
+
+    setTimeout(()=> playReveal(slides[idx]), 20);
+
+  }
+
+
+
+  document.getElementById('nextBtn').addEventListener('click', ()=>show(current+1));
+
+  document.getElementById('prevBtn').addEventListener('click', ()=>show(current-1));
+
+
+
+  document.addEventListener('keydown', (e)=>{
+
+    if(e.key==='ArrowRight') show(current+1);
+
+    if(e.key==='ArrowLeft') show(current-1);
+
+    if(e.key==='Home') show(0);
+
+    if(e.key==='End') show(total-1);
+
+    if(e.key==='f' || e.key==='F'){
+
+      document.body.classList.toggle('focus-mode');
+
+    }
+
+  });
+
+
+
+  // 터치 스와이프
+
+  let startX=null;
+
+  deck.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }, {passive:true});
+
+  deck.addEventListener('touchend', (e)=>{
+
+    if(startX===null) return;
+
+    const dx = e.changedTouches[0].clientX - startX;
+
+    if(Math.abs(dx)>40){
+
+      if(dx<0) show(current+1);
+
+      else show(current-1);
+
+    }
+
+    startX=null;
+
+  }, {passive:true});
+
+
+
+  // 첫 슬라이드 표시
+
+  show(0);
+
 })();
 
-/* 슬라이드 내비 & 애니메이션 */
+
+
+/* 개강 안내 메일 본문 예시 토글 */
+
 (function(){
-const deck = document.getElementById('deck');
-const slides = Array.from(document.querySelectorAll('.slide'));
-const total = slides.length;
-let current = 0;
 
-const dotsWrap = document.getElementById('dots');
-const progressInner = document.getElementById('progressInner');
+  const btn = document.getElementById('guideToggleResult');
 
-const dots = slides.map((_,i)=>{
-const d=document.createElement('div');
-d.className='dot'; d.dataset.i=i;
-d.addEventListener('click', ()=>show(i));
-dotsWrap.appendChild(d);
-return d;
-});
+  const box = document.getElementById('guideResultBox');
 
-function updateDots(){
-dots.forEach((d,i)=>d.classList.toggle('active', i===current));
-}
+  if(!btn || !box) return;
 
-function updateProgress(){
-if(!progressInner) return;
-const ratio = (current+1)/total;
-progressInner.style.width = (ratio*100) + '%';
-}
+  btn.addEventListener('click', ()=>{
 
-function playReveal(slideEl){
-slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.remove('show'));
-slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.remove('show'));
-requestAnimationFrame(()=>{
-requestAnimationFrame(()=>{
-slideEl.querySelectorAll('.reveal').forEach(el=> el.classList.add('show'));
-slideEl.querySelectorAll('.stagger').forEach(el=> el.classList.add('show'));
-});
-});
-}
+    const show = box.classList.toggle('show');
 
-function show(idx){
-if(idx<0) idx=0;
-if(idx>=total) idx=total-1;
-current = idx;
-deck.style.transform = `translateX(-${idx*100}%)`;
-updateDots();
-updateProgress();
-setTimeout(()=> playReveal(slides[idx]), 60);
-}
+    btn.innerHTML = show
 
-document.getElementById('nextBtn').addEventListener('click', ()=>show(current+1));
-document.getElementById('prevBtn').addEventListener('click', ()=>show(current-1));
+      ? '<span class="icon">✉️</span> 메일 본문 예시 닫기'
 
-document.addEventListener('keydown', (e)=>{
-if(e.key==='ArrowRight') show(current+1);
-if(e.key==='ArrowLeft') show(current-1);
-});
+      : '<span class="icon">✉️</span> 메일 본문 예시 보기';
 
-let startX=null;
-deck.addEventListener('touchstart', (e)=>{ startX=e.touches[0].clientX; }, {passive:true});
-deck.addEventListener('touchend', (e)=>{
-if(startX===null) return;
-const dx = e.changedTouches[0].clientX - startX;
-if(Math.abs(dx)>50){
-if(dx<0) show(current+1);
-else show(current-1);
-}
-startX=null;
-}, {passive:true});
+  });
 
-show(0);
 })();
+
+
 
 /* 세미나 출결 라이브 데모 로직 */
+
 (function(){
+
   const form = document.getElementById('attendanceForm');
+
   if (!form) return;
 
-  const MS_ENDPOINT_URL = "https://example.com/your-ms-endpoint"; // Power Automate URL
+
+
+  const MS_ENDPOINT_URL = "https://example.com/your-ms-endpoint"; // 실제 Power Automate URL로 교체
+
   const DEFAULT_PIN = "123456";
+
   const DEFAULT_COURSE = "리스크 관리";
 
+
+
   let currentPin = localStorage.getItem("seminarPin") || DEFAULT_PIN;
+
   let courseName = localStorage.getItem("courseName") || DEFAULT_COURSE;
+
   let showCourseName = (localStorage.getItem("showCourseName") !== "false"); // 기본 true
 
+
+
   const courseBadge = document.getElementById("attendCourseBadge");
+
   const statusMsg = document.getElementById("attendStatusMsg");
+
   const submitBtn = document.getElementById("attendSubmitBtn");
+
   const titleWrap = document.getElementById("attendTitleWrap");
 
+
+
   const nameInput = document.getElementById("attendName");
+
   const empIdInput = document.getElementById("attendEmpId");
+
   const pinInput = document.getElementById("attendPin");
 
+
+
   const adminModal = document.getElementById("adminModalAttend");
+
   const adminCourseNameInput = document.getElementById("adminCourseNameAttend");
+
   const adminPinInput = document.getElementById("adminPinAttend");
+
   const adminShowCourseInput = document.getElementById("adminShowCourseAttend");
+
   const adminSaveBtn = document.getElementById("adminSaveAttend");
+
   const adminCancelBtn = document.getElementById("adminCancelAttend");
 
+
+
   function renderCourseBadge() {
+
     if (!courseBadge) return;
+
     if (showCourseName) {
+
       courseBadge.style.display = "inline-flex";
+
       courseBadge.textContent = "과정명: " + courseName;
+
     } else {
+
       courseBadge.style.display = "none";
+
     }
+
   }
+
   renderCourseBadge();
 
-  // 제목 3번 클릭 → 운영자 설정 열기 (화면에 안내는 안 함)
+
+
+  // 제목 3번 클릭 → 운영자 설정 열기
+
   let clickCount = 0;
+
   let clickTimer = null;
 
+
+
   if (titleWrap) {
+
     titleWrap.addEventListener("click", () => {
+
       clickCount++;
+
       if (clickCount === 1) {
+
         clickTimer = setTimeout(() => { clickCount = 0; }, 700);
+
       }
+
       if (clickCount === 3) {
+
         clearTimeout(clickTimer);
+
         clickCount = 0;
+
         openAdminModal();
+
       }
+
     });
+
   }
+
+
 
   function openAdminModal() {
+
     if (!adminModal) return;
+
     adminCourseNameInput.value = courseName;
+
     adminPinInput.value = currentPin;
+
     adminShowCourseInput.checked = showCourseName;
+
     adminModal.style.display = "flex";
+
     adminCourseNameInput.focus();
+
   }
+
+
 
   function closeAdminModal() {
+
     if (!adminModal) return;
+
     adminModal.style.display = "none";
+
   }
+
+
 
   if (adminCancelBtn) adminCancelBtn.addEventListener("click", closeAdminModal);
+
   if (adminModal) {
+
     adminModal.addEventListener("click", (e) => {
+
       if (e.target === adminModal) closeAdminModal();
+
     });
+
   }
+
+
 
   if (adminSaveBtn) {
+
     adminSaveBtn.addEventListener("click", () => {
+
       const newCourse = adminCourseNameInput.value.trim() || DEFAULT_COURSE;
+
       const newPin = adminPinInput.value.trim() || DEFAULT_PIN;
+
       const newShow = adminShowCourseInput.checked;
 
+
+
       if (!/^\d{4,6}$/.test(newPin)) {
+
         alert("PIN 번호는 숫자 4~6자리로 설정해주세요.");
+
         return;
+
       }
 
+
+
       courseName = newCourse;
+
       currentPin = newPin;
+
       showCourseName = newShow;
 
+
+
       localStorage.setItem("courseName", courseName);
+
       localStorage.setItem("seminarPin", currentPin);
+
       localStorage.setItem("showCourseName", showCourseName);
 
+
+
       renderCourseBadge();
+
       closeAdminModal();
+
       alert("설정이 저장되었습니다.");
+
     });
+
   }
 
+
+
   // 출석 제출
+
   form.addEventListener("submit", async (e) => {
+
     e.preventDefault();
+
     statusMsg.textContent = "";
+
     statusMsg.className = "attend-status";
 
+
+
     const name = nameInput.value.trim();
+
     const empId = empIdInput.value.trim();
+
     const pinVal = pinInput.value.trim();
 
+
+
     if (!name || !empId || !pinVal) {
+
       statusMsg.textContent = "이름, 사번, PIN을 모두 입력해 주세요.";
+
       statusMsg.className = "attend-status err";
+
       return;
+
     }
+
+
 
     if (pinVal !== currentPin) {
+
       statusMsg.textContent = "PIN 번호가 일치하지 않습니다.";
+
       statusMsg.className = "attend-status err";
+
       return;
+
     }
 
+
+
     submitBtn.disabled = true;
+
     submitBtn.textContent = "전송 중...";
 
+
+
     const payload = {
+
       name,
+
       employeeId: empId,
+
       pin: pinVal,
+
       courseName,
+
       showCourseName,
+
       timestamp: new Date().toISOString(),
+
     };
 
+
+
     try {
+
       const res = await fetch(MS_ENDPOINT_URL, {
+
         method: "POST",
+
         headers: {"Content-Type": "application/json"},
+
         body: JSON.stringify(payload)
+
       });
+
+
 
       if (!res.ok) throw new Error("응답 코드: " + res.status);
 
+
+
       statusMsg.textContent = "출석이 정상적으로 기록되었습니다!";
+
       statusMsg.className = "attend-status ok";
+
       form.reset();
+
     } catch (err) {
+
       console.error(err);
+
       statusMsg.textContent = "전송 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+
       statusMsg.className = "attend-status err";
+
     } finally {
+
       submitBtn.disabled = false;
+
       submitBtn.textContent = "출석 체크";
+
     }
+
   });
+
 })();
+
 </script>
+
 </body>
+
 </html>
+
