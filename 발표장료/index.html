@@ -1660,22 +1660,22 @@ h3{
 }
 
 .live-demo-iframe{
-
-  width:100%;
-
-  height:320px;
-
-  border-radius:12px;
-
-  border:1px solid #E5E7EB;
-
-  background:#FFFFFF;
-
+ width:100%;
+ /* 기본형은 조금만 높게 */
+ height:360px;
+ border-radius:12px;
+ border:1px solid #E5E7EB;
+ background:#FFFFFF;
+}
+/* 전체 화면을 거의 다 쓰는 대형 버전 (메일용) */
+.live-demo-iframe--large{
+ /* 헤더/제목/여백 감안해서 화면 높이 - 260px 정도 */
+ height:calc(100vh - 240px);
 }
   
 /* HTML 메일 전체가 보이도록 높이를 늘린 버전 */
 .live-demo-iframe--large{
- height:480px;
+ height:590px;
 }
 
 
@@ -2420,278 +2420,68 @@ h3{
     </section>
 
 
+<!-- 10. LG Science Park 방문 안내 페이지 (설명) -->
+<section class="slide" data-i="10" data-background="#020617">
+<div class="slide-header-top">
+<div class="brand">
+<img src="biztechon.logo.png" alt="BizTechON" class="brand-logo">
+<div class="brand-text-2">교육운영파트</div>
+</div>
+<div class="page-indicator">10 / 99</div>
+</div>
+<div class="main">
+<div class="section-tag">
+<span class="section-dot"></span><span>Demo 2 · Visit Portal</span>
+</div>
+<h1>LG Science Park 방문 안내 페이지</h1>
+<p class="small">
+     강사 방문 절차를 Copilot으로 설계하고 실제 웹폼으로 구현한 사례입니다.<br>
+     방문포탈 접속부터 장비 반입, 차량 등록, 교재 안내까지 한 페이지로 정리했습니다.
+</p>
+<div class="card">
+<h3 style="color:#a50034;margin-bottom:12px;">주요 구현 포인트</h3>
+<ul style="color:#020617;line-height:1.8;font-size:14px;">
+<li>Copilot을 통해 요구사항 정리 후 TailwindCSS 기반 페이지 개발</li>
+<li>방문포탈 안내, 장비/차량/교재 등록, 파일 업로드 기능 포함</li>
+<li>자동저장, 다크모드, FAQ 모달 등 UX 강화</li>
+<li>EmailJS 연동으로 운영자 자동 메일 발송</li>
+</ul>
+<p class="small" style="margin-top:10px;color:#020617;">
+       👉 다음 슬라이드에서 실제 GitHub Pages 페이지를 직접 보여드립니다.
+</p>
+</div>
+</div>
+</section>
+
+    
+<!-- 11. LG Science Park 방문 안내 (실제 GitHub 페이지 DEMO) -->
+<section class="slide" data-i="11" data-background="#020617">
+<div class="slide-header-top">
+<div class="brand">
+<img src="biztechon.logo.png" alt="BizTechON" class="brand-logo">
+<div class="brand-text-2">교육운영파트</div>
+</div>
+<div class="page-indicator">11 / 99</div>
+</div>
+<div class="main">
+<div class="section-tag">
+<span class="section-dot"></span><span>Demo 2 · Visit Portal</span>
+</div>
+<h1>실제 방문 안내 페이지 (GitHub Pages)</h1>
+<p class="small">
+     아래는 GitHub에 실제 배포된 <code>lg-visit.html</code> 페이지입니다.<br>
+     슬라이드 내에서 직접 스크롤·탭 전환 등 모든 기능을 시연할 수 있습니다.
+</p>
+<div class="card" style="padding:10px;border-radius:16px;margin-top:10px;">
+<iframe
+       src="https://edulorix.github.io/any/%EB%B0%9C%ED%91%9C%EC%9E%A5%EB%A3%8C/lg-visit.html"
+       style="width:100%;height:calc(100vh - 300px);border:1px solid #1e293b;border-radius:12px;"
+       title="LG Science Park 방문 안내 실제 페이지">
+</iframe>
+</div>
+</div>
+</section>
 
-    <!-- 9. Demo 2 – 화면 (+ 방문 안내 데모 iframe 자리 추가) -->
-
-    <section class="slide">
-
-      <div class="slide-header-top">
-
-        <div class="brand">
-
-          <img src="biztechon.logo.png" alt="BizTechON" class="brand-logo">
-
-            <div class="brand-text-2">교육운영파트</div>
-
-        </div>
-
-        <div class="page-indicator">9 / 16</div>
-
-      </div>
-
-
-
-      <div class="main">
-
-        <div class="section-tag"><span class="section-dot"></span><span>Demo 2 · Visit Guide</span></div>
-
-        <h1>Demo 2 – LG Science Park 방문 안내 화면</h1>
-
-        <div class="grid-2">
-
-          <div class="card">
-
-            <div class="demo-tag">강사용 방문 안내 페이지 요약</div>
-
-            <div class="guide-shell">
-
-              <div class="guide-card">
-
-                <div class="guide-header">
-
-                  <div>
-
-                    <div class="guide-eyebrow">VISIT GUIDE</div>
-
-                    <div class="guide-title">LG Science Park 방문 안내</div>
-
-                  </div>
-
-                  <div class="guide-chip">강사님 전용 링크</div>
-
-                </div>
-
-                <p class="guide-sub">
-
-                  SW 보안 세미나 강의를 위해 LG Science Park를 방문하시는 강사님을 위한 안내 페이지입니다.<br>
-
-                  방문 등록, 장비·차량 정보, 교재 전달까지 이 페이지 하나로 정리하실 수 있습니다.
-
-                </p>
-
-
-
-                <div class="guide-view-tabs">
-
-                  <button type="button" class="guide-tab-btn active" id="guideTabPc">PC 화면</button>
-
-                  <button type="button" class="guide-tab-btn" id="guideTabMo">모바일 화면</button>
-
-                </div>
-
-
-
-                <div class="guide-mock">
-
-                  <div id="guidePc" class="guide-mock-section active">
-
-                    <div style="display:flex;gap:10px;">
-
-                      <div style="flex:1;">
-
-                        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">STEP 1. 방문포털 접속</div>
-
-                        <div style="background:#EEF2FF;border-radius:8px;padding:6px 8px;margin-bottom:6px;font-size:12px;">
-
-                          <b>방문포털 링크</b><br>
-
-                          · 비회원 방문 예약으로 진행<br>
-
-                          · 방문 장소: LG전자 마곡<br>
-
-                          · 방문 기간: 교육 기간 전체
-
-                        </div>
-
-                        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">STEP 2. 실습자료·프로그램 업로드</div>
-
-                        <div style="background:#ECFDF3;border-radius:8px;padding:6px 8px;font-size:12px;">
-
-                          · 수업 중 사용할 설치 파일 / 코드 업로드<br>
-
-                          · “해당사항 없음” 체크 시 영역 비활성화
-
-                        </div>
-
-                      </div>
-
-                      <div style="width:40%;font-size:11px;">
-
-                        <div style="background:#F9FAFB;border-radius:8px;border:1px dashed #E5E7EB;padding:6px 6px 5px;margin-bottom:6px;text-align:center;">
-
-                          (drag &amp; drop 영역)<br>
-
-                          파일을 끌어다 놓으면<br>자동 업로드 &amp; 요약 표시
-
-                        </div>
-
-                        <div style="background:#FFF7ED;border-radius:8px;padding:6px 8px;font-size:11px;">
-
-                          <b>운영자 정보</b><br>
-
-                          김미진(7477), 정하연(6894)<br>
-
-                          선송이(7020), 유지혜(0530)
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-
-
-                  <div id="guideMo" class="guide-mock-section">
-
-                    <div style="display:flex;justify-content:center;">
-
-                      <div style="width:210px;border-radius:18px;border:2px solid #E5E7EB;padding:10px;background:#F9FAFB;">
-
-                        <div style="background:var(--accent);color:#F9FAFB;border-radius:10px;padding:6px 8px;font-size:11px;margin-bottom:8px;text-align:center;">
-
-                          LG Science Park 방문 안내
-
-                        </div>
-
-                        <div style="background:#FFFFFF;border-radius:10px;padding:6px 8px;font-size:11px;margin-bottom:6px;">
-
-                          <b>오늘의 교육</b><br>
-
-                          SW 보안 세미나 · 13:30<br>
-
-                          C동 3층 Vision Hall
-
-                        </div>
-
-                        <div style="background:#FFFFFF;border-radius:10px;padding:6px 8px;font-size:11px;margin-bottom:6px;">
-
-                          <b>방문 전 준비</b><br>
-
-                          ① 방문포털 비회원 예약<br>
-
-                          ② 노트북 MAC 주소 입력<br>
-
-                          ③ 차량 번호 등록(필요 시)
-
-                        </div>
-
-                        <div style="background:#FFFFFF;border-radius:10px;padding:6px 8px;font-size:11px;">
-
-                          <b>실습 자료</b><br>
-
-                          아래 버튼으로 사전 다운로드 후<br>
-
-                          수업 전에 설치를 완료해 주세요.
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-
-
-                <div class="guide-meta-mini">
-
-                  <div class="guide-mini">
-
-                    <div class="guide-mini-label">방문 관련 문의</div>
-
-                    <div class="guide-mini-value">약 50건 → 10건 내외</div>
-
-                  </div>
-
-                  <div class="guide-mini">
-
-                    <div class="guide-mini-label">접속 기기 비중</div>
-
-                    <div class="guide-mini-value">모바일 약 70%</div>
-
-                  </div>
-
-                  <div class="guide-mini">
-
-                    <div class="guide-mini-label">운영자 입장</div>
-
-                    <div class="guide-mini-value">재안내·재설명 부담 감소</div>
-
-                  </div>
-
-                </div>
-
-
-
-                <a href="https://edulorix.github.io/-page-magok-lecture-guide.html/8" target="_blank" class="guide-link-btn">
-
-                  사외 강사 사이트
-
-                </a>
-
-              </div>
-
-            </div>
-
-          </div>
-
-
-
-          <div class="card">
-
-            <h3>이 Demo에서 보여주려는 것</h3>
-
-            <ul>
-
-              <li>강사·교육생·운영자가 모두 <b>같은 화면</b>을 기준으로 소통</li>
-
-              <li>필수 정보(출입·주차·장비·교재)를 단계별로 안내</li>
-
-              <li>입력된 정보는 향후 메일·보고·출석 데이터와 다시 연결 가능</li>
-
-            </ul>
-
-            <p class="small" style="margin-top:6px;">
-
-              발표 중에는 이 슬라이드로 구조를 설명한 뒤,<br>
-
-              우측 하단 버튼으로 실제 페이지를 잠깐 시연하는 흐름을 추천드립니다.
-
-            </p>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- ✅ 실제 방문 안내 데모 iframe (네가 준 데모 코드가 여기로 들어감) -->
-
-        <div class="live-demo-frame-shell" style="margin-top:14px;">
-
-          <div class="live-demo-frame-label">실제 방문 안내 페이지 (발표용 데모)</div>
-
-          <iframe id="visitDemoFrame" class="live-demo-iframe" title="LG Science Park 방문 안내 데모"></iframe>
-
-        </div>
-
-      </div>
-
-    </section>
 
 
 
