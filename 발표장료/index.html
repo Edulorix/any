@@ -1,3 +1,4 @@
+
 <!doctype html>
 
 <html lang="ko">
@@ -6695,136 +6696,160 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
   if(visitFrame&&visitTpl) visitFrame.srcdoc=visitTpl.innerHTML;
 })();
 </script>
-      <!-- ===== Presenter Notes & Mode (drop-in) ===== -->
+<!-- ===== Presenter Notes & Mode (업데이트 버전) ===== -->
 <style>
-  /* 발표자 노트 기본 비노출 */
-  .speaker-notes{display:none;margin-top:14px;padding:10px 12px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;color:#334155;font-size:12.5px;line-height:1.8}
-  .speaker-notes b{color:#0f172a}
-  /* 발표자 모드 켜짐 */
-  body.show-notes .speaker-notes{display:block}
-  /* 우측 하단 토글 */
-  .notes-toggle{
-    position:fixed;right:22px;bottom:68px;z-index:60;border:none;border-radius:999px;
-    padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer;
-    background:#111827;color:#f9fafb;box-shadow:0 12px 26px rgba(15,23,42,.4)
+  .speaker-notes {
+    display: none;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.8;
   }
-  .notes-toggle .k{opacity:.7;font-weight:600;padding:2px 6px;border-radius:6px;background:rgba(255,255,255,.08);margin-left:8px}
+  .speaker-notes b { color: #0f172a; }
+  body.show-notes .speaker-notes { display: block; }
+  .notes-toggle {
+    position: fixed;
+    right: 22px;
+    bottom: 68px;
+    z-index: 60;
+    border: none;
+    border-radius: 999px;
+    padding: 9px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #111827;
+    color: #f9fafb;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.4);
+  }
+  .notes-toggle .k {
+    opacity: .7;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(255,255,255,.08);
+    margin-left: 8px;
+  }
 </style>
 
 <script>
 (function(){
-  // === 1) 슬라이드별 발표 대본 (공식/간결/핵심 위주) ===
-  // DOM 상 순서대로 매핑 (부족하면 생략, 넘치면 무시)
+  // 🎙 슬라이드 순서별 발표 대본 (공식 & 전문성 유지)
   const NOTES = [
 /* 0. 표지 */ `
-<b>메시지</b> 오늘은 “안내→방문→출석”을 하나의 흐름으로 정리한 <b>실무 데모</b>를 공유드립니다.
-<b>포인트</b> 새 시스템 도입이 아니라, <b>MS365 안에서</b> 반복공수를 줄인 사례에 초점.
+<b>인트로</b> 안녕하세요, 교육운영파트 김미진입니다.<br>
+오늘은 <b>AI로 정리한 스마트 교육운영 Demo</b>를 보여드릴 예정입니다.<br>
+메일, 방문, 출석 — 세 흐름을 한 번의 입력으로 연결하는 사례입니다.
 `,
 /* 1. 우리가 하는 일 & Pain */ `
-<b>문제정의</b> 동일정보를 메일·문서·출석부에 <b>여러 번</b> 입력해 오류/검수가 누적됩니다.
-<b>사례</b> 일정 변경 시 모든 채널 재수정, 종이서명 재입력(행사당 10~15분).
-<b>관점</b> “같은 정보를 <b>한 번</b>만 쓰자”는 원칙으로 데이터 흐름을 재정렬합니다.
+<b>설명</b> 저희 파트는 연간 교육 운영과 안내, 출석, 결과 보고까지 담당하고 있습니다.<br>
+반복되는 안내·메일·문서 작업이 많다 보니, 오타나 중복 수정이 잦았습니다.<br>
+그래서 ‘같은 정보를 여러 번 쓰지 말자’는 원칙 아래 프로세스를 다시 정리했습니다.
 `,
 /* 2. Why & 원칙 */ `
-<b>목표</b> 안내→방문→출석을 <b>토큰</b>으로 연결({과정명},{일시},{장소},{PIN}).
-<b>방법</b> 기존 도구 유지(Outlook/EP, Forms/PA/SharePoint), <b>템플릿 통일</b>, 현장 친화.
-<b>안내</b> 오늘은 Demo 1(메일) → 2(방문) → 3(출석) 순서로 보시게 됩니다.
+<b>핵심</b> 완전히 새로운 시스템이 아니라, <b>MS365 안</b>에서 흐름을 정돈했습니다.<br>
+메일, 방문, 출석이 각각 흩어져 있던 것을 하나의 데이터 세트로 연결하고,<br>
+입력은 한 번, 결과는 세 곳에서 재사용되도록 만들었습니다.
 `,
 /* 3. Demo Overview */ `
-<b>구성</b> Demo 1: HTML 메일 / Demo 2: 방문 안내 페이지 / Demo 3: PIN 출석.
-<b>핵심</b> 한 세트의 입력값을 세 채널에서 <b>재사용</b>하도록 설계했습니다.
-<b>시연</b> 각 데모는 슬라이드 내/외부 페이지로 직접 동작 확인.
+<b>구성</b> 오늘은 Demo 1 메일, Demo 2 방문 안내, Demo 3 PIN 출석 순으로 보여드립니다.<br>
+세 과정 모두 {과정명}, {일시}, {장소}, {PIN} 등 동일한 토큰 구조로 움직입니다.
 `,
 /* 4. Demo1 구조 */ `
-<b>문제</b> 메일 형식/톤이 제각각 → 검수/수정 반복.
-<b>개선</b> 고정 문장 vs 가변 값 분리, <b>가변은 {토큰}</b>화, Outlook 호환 HTML.
-<b>다음</b> Copilot 프롬프트 패턴과 실제 초안을 연속 시연합니다.
+<b>설명</b> 메일마다 형식이 달라 검수와 수정에 많은 시간이 들었습니다.<br>
+이를 해결하기 위해 <b>고정 문장</b>과 <b>가변 값</b>을 분리하고, 자주 바뀌는 부분만 {토큰}으로 설정했습니다.<br>
+이렇게 하면 한 번의 입력으로 여러 문서를 자동 갱신할 수 있습니다.
 `,
-/* 5. Demo1 Copilot 타이핑 */ `
-<b>설명</b> 좌측 프롬프트가 <b>천천히 타이핑</b>되며, 생성된 초안이 아래에 표시됩니다.
-<b>주의</b> {토큰}은 그대로 유지하여 후속 단계에서 자동 치환됩니다.
-<b>메모</b> 초안은 “검토/수정의 출발점”으로 활용합니다.
+/* 5. Demo1 Copilot */ `
+<b>시연</b> 이 화면은 실제 Copilot에 프롬프트를 입력해 초안을 생성하는 장면입니다.<br>
+‘SW 보안 세미나 개강 안내 메일을 써줘’처럼 말로 요청하면,<br>
+Copilot이 초안을 만들어주고, 토큰 구조를 그대로 유지해 검수 시간을 줄였습니다.
 `,
-/* 6. Demo1 실제 HTML 메일 */ `
-<b>설명</b> 실제 HTML 메일 구조(Outlook/EP <b>인라인 CSS</b> 호환)입니다.
-<b>포인트</b> {과정명},{일시},{장소},{대상},{PIN},{문의처}는 엑셀/CSV로 채움.
-<b>전환</b> 메일 하단 버튼으로 방문 안내 페이지로 연결됩니다.
+/* 6. Demo1 HTML 메일 */ `
+<b>설명</b> 이건 실제 Outlook용 HTML 메일 템플릿입니다.<br>
+{과정명}, {일시}, {장소}, {PIN}, {문의처} 같은 값만 엑셀이나 CSV에서 자동 채워집니다.<br>
+따라서 매번 서식을 새로 만들 필요 없이 재활용이 가능합니다.
 `,
 /* 7. Demo2 Why */ `
-<b>문제</b> “어디로 가나요/주차 되나요?” <b>반복 문의</b>, 문구 불일치.
-<b>목표</b> 외부 강사/참여자에게 <b>하나의 링크</b>로 모든 안내 제공.
-<b>흐름</b> 메일 하단 버튼 → 방문 페이지 → 자료/차량/장비 입력.
+<b>문제</b> 이전엔 강사분들이 ‘주차 되나요?’ ‘어디로 가야 하나요?’ 같은 문의를 매번 하셨습니다.<br>
+그래서 모든 정보를 한 페이지에 모아 <b>방문 안내 포털</b>로 정리했습니다.<br>
+메일 하단 버튼을 클릭하면 바로 이 페이지로 연결됩니다.
 `,
-/* 8. 방문 안내 페이지(설명) */ `
-<b>구현</b> 요구사항을 Copilot으로 정리 후 <b>웹폼</b> 구현(자동저장, 다크모드, FAQ).
-<b>연계</b> EmailJS(데모용) → 실제 운영 전환 시 <b>Power Automate</b>로 대체.
-<b>시연</b> 다음 장에서 GitHub Pages 실페이지를 직접 스크롤 시연합니다.
+/* 8. Demo2 설명 */ `
+<b>설명</b> 방문 안내 페이지는 TailwindCSS 기반으로 Copilot과 함께 설계했습니다.<br>
+EmailJS를 통해 임시로 자동메일이 발송되며, 실제 운영 시에는 Power Automate로 전환할 예정입니다.
 `,
-/* 9. 방문 안내 실제 페이지(IFrame) */ `
-<b>시연</b> 탭 전환(안내/업로드/운영자)을 스크롤로 확인.
-<b>전환계획</b> 사내 적용 시 <b>SharePoint/OneDrive 업로드</b>로 치환, 권한/기록 관리 강화.
+/* 9. Demo2 실제 GitHub 페이지 */ `
+<b>시연</b> 지금 화면은 실제 GitHub Pages에 배포된 방문 안내 페이지입니다.<br>
+PC와 모바일 탭 전환, 파일 업로드, 운영자 정보까지 한 페이지에 정리되어 있습니다.
 `,
-/*10. Demo3 Why(출석) */ `
-<b>문제</b> 종이서명 재입력/누락/판독 이슈로 <b>시간 소모</b>.
-<b>개선</b> 공용 PC에서 <b>이름·사번·PIN</b>만 입력 → 즉시 기록(개인정보는 MA 내 처리).
-<b>운영</b> 운영자 모달로 현장에서 과정명/PIN 변경 가능(교육생 비가시).
+/*10. Demo3 Why */ `
+<b>배경</b> 종이 출석부의 재입력, 누락, 판독 문제를 해결하기 위해 공용 PC 기반 PIN 출석으로 바꿨습니다.<br>
+교육생은 이름, 사번, PIN만 입력하면 출석이 자동 기록됩니다.
 `,
 /*11. Demo3 출석 데모 */ `
-<b>시연</b> 제가 직접 <b>PIN 일치</b>를 확인해보겠습니다. 제목 3회 클릭 시 운영자 설정.
-<b>보안</b> 실데모는 저장 안 함. 실제 환경에선 <b>MS Forms/PA/SharePoint</b>로 전송.
+<b>시연</b> 지금 보시는 화면이 PIN 입력 데모입니다.<br>
+운영자는 제목을 3회 클릭하면 PIN이나 과정명을 현장에서 바로 바꿀 수 있습니다.<br>
+실제 저장은 하지 않지만, Power Automate와 연동 시 자동 집계가 가능합니다.
 `,
 /*12. Impact */ `
-<b>효과</b> 검수/문체 수정 건수 감소, 문의량 감소(체감), 출석 정리 <b>5분 이내</b> 목표.
-<b>조직 관점</b> MS365/웹 표준 기반이라 타 본부 <b>재사용</b>이 용이.
-<b>메시지</b> 전면 교체가 아니라 <b>흐름 정리</b>로 공수를 줄였습니다.
+<b>성과</b> 메일 검수 시간 30분→5분, 출석 정리 10~15분→5분 내 단축.<br>
+반복 문의도 절반 이하로 감소했습니다.<br>
+특히 구조가 MS365 기반이라 다른 본부에서도 바로 응용 가능합니다.
 `,
-/*13. Copilot 가이드 */ `
-<b>원칙</b> 목적→결과형태→수정지시→맥락연결→정책반영 순서로 요청.
-<b>역할</b> Copilot은 <b>초안 생성+검수 도우미</b>, 최종 책임은 운영자.
-<b>산출물</b> HTML 템플릿, 토큰 리스트, 안내 문구 세트.
+/*13. Copilot */ `
+<b>핵심</b> Copilot을 가장 효율적으로 쓰는 5단계 패턴입니다.<br>
+1️⃣ 목적을 명확히, 2️⃣ 결과 형태를 지정, 3️⃣ 수정 지시 반복, 4️⃣ 맥락 연결, 5️⃣ 정책 반영.<br>
+Copilot은 초안을 빠르게 만드는 <b>협업자</b>로 활용하는 것이 핵심입니다.
 `,
 /*14. FAQ */ `
-<b>운영자 역량</b> 코딩 몰라도 {토큰}값만 교체하면 사용 가능.
-<b>보안</b> 개인정보는 MA 내부 처리, Copilot에는 서식/비식별 정보만.
-<b>도입순서</b> 효과 큰 메일→출석→방문 순으로 단계 도입 권장.
+<b>FAQ 요약</b><br>
+· 코딩 몰라도 토큰만 바꾸면 누구나 사용 가능<br>
+· 개인정보는 MS365 내에서만 처리<br>
+· 다른 본부도 색상·로고만 바꿔 재사용 가능<br>
+· 단계 도입은 메일 → 출석 → 방문 순이 효율적
 `,
-/*15. Next Year */ `
-<b>우선순위</b> 출석 자동화 안정화→템플릿 확대→Copilot 가이드 배포.
-<b>방식</b> 효과 본 영역부터 <b>점진 확장</b>, 현장 피드백 반영.
+/*15. Next */ `
+<b>내년 계획</b> 출석 자동화 안정화, 템플릿 확대, Copilot 가이드 공유.<br>
+효과 본 영역부터 점진적으로 확장할 계획입니다.
 `,
 /*16. Closing */ `
-<b>클로징</b> 오늘 데모를 각 조직 상황에 맞게 <b>가볍게 시범 적용</b>해보길 제안드립니다.
-<b>요청</b> 적용 희망/우려사항/개선 아이디어를 회신 주시면 설계에 반영하겠습니다.
+<b>마무리</b> 오늘 Demo가 각 부서의 현실에 맞게 적용될 수 있기를 바랍니다.<br>
+함께 실험해 보고 싶은 아이디어가 있으시면 언제든 제안 부탁드립니다.
 `
   ];
 
-  // === 2) 노트 DOM 주입 ===
+  // DOM 삽입
   const slides = Array.from(document.querySelectorAll('.slide'));
-  slides.forEach((s,i)=>{
-    if(!NOTES[i]) return;
+  slides.forEach((s, i) => {
+    if (!NOTES[i]) return;
     const aside = document.createElement('aside');
     aside.className = 'speaker-notes';
     aside.innerHTML = NOTES[i].trim();
     s.appendChild(aside);
   });
 
-  // === 3) 토글 UI & 단축키 ===
+  // 토글 버튼
   const btn = document.createElement('button');
-  btn.className='notes-toggle';
-  btn.innerHTML='발표자 노트<span class="k">N</span>';
-  btn.title='발표자 노트 토글 (N)';
-  btn.addEventListener('click',()=>document.body.classList.toggle('show-notes'));
+  btn.className = 'notes-toggle';
+  btn.innerHTML = '발표자 노트<span class="k">N</span>';
+  btn.title = '발표자 노트 보기/숨기기 (단축키 N)';
+  btn.addEventListener('click', () => document.body.classList.toggle('show-notes'));
   document.body.appendChild(btn);
 
-  // URL 파라미터 / 해시로 기본 켜기: ?notes=1 또는 #notes
+  // 파라미터로 자동 ON
   const qp = new URLSearchParams(location.search);
-  if(qp.get('notes')==='1'||location.hash==='#notes'){
+  if (qp.get('notes') === '1' || location.hash === '#notes') {
     document.body.classList.add('show-notes');
   }
 
-  // 단축키: N 토글
-  document.addEventListener('keydown',e=>{
-    if(e.key.toLowerCase()==='n'){
+  // 단축키 N
+  document.addEventListener('keydown', (e) => {
+    if (e.key.toLowerCase() === 'n') {
       e.preventDefault();
       document.body.classList.toggle('show-notes');
     }
@@ -6832,5 +6857,6 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 })();
 </script>
 <!-- ===== /Presenter Notes & Mode ===== -->
+
 </body>
 </html>
