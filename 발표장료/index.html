@@ -757,29 +757,18 @@ h3{
 }
 
 .mail-demo-output{
-
-  margin-top:8px;
-
-  border-radius:10px;
-
-  border:1px solid #E5E7EB;
-
-  background:#FFFFFF;
-
-  padding:8px 10px;
-
-  font-size:12px;
-
-  max-height:210px;
-
-  overflow:auto;
-
-  opacity:0;
-
-  transform:translateY(6px);
-
-  transition:opacity .5s ease, transform .5s ease;
-
+ margin-top:8px;
+ border-radius:10px;
+ border:1px solid #E5E7EB;
+ background:#FFFFFF;
+ padding:8px 10px;
+ font-size:12px;
+ /* 내부 스크롤 제거 */
+ max-height:none;
+ overflow:visible;
+ opacity:0;
+ transform:translateY(6px);
+ transition:opacity .5s ease, transform .5s ease;
 }
 
 .mail-demo-output.visible{
@@ -4927,66 +4916,36 @@ button[disabled]{opacity:.7;cursor:wait;}
 
 
 
-/* Demo 1 – 메일 프롬프트 타이핑 */
-
+/* Demo 1 – 메일 프롬프트 타이핑 움짤 (한 번만 실행, 사라지지 않음) */
 (function(){
-
-  const promptEl = document.getElementById('mailPrompt');
-
-  const outputEl = document.getElementById('mailOutput');
-
-  if(!promptEl || !outputEl) return;
-
-
-
-  const promptText =
-
-    "SW 보안 세미나 개강 안내 메일 초안을, 내부 임직원 대상, 존댓말, 8줄 이내로 써줘. " +
-
-    "일정/장소/대상/문의처는 {일시}, {장소}, {대상}, {문의처} 같은 {토큰} 형태로 남겨줘.";
-
-
-
-  let idx = 0;
-
-  function loop(){
-
-    idx = 0;
-
-    promptEl.textContent = "";
-
-    outputEl.classList.remove('visible');
-
-    typeChar();
-
-  }
-
-  function typeChar(){
-
-    if(idx <= promptText.length){
-
-      promptEl.textContent = promptText.slice(0, idx++);
-
-      setTimeout(typeChar, 50);
-
-    }else{
-
-      setTimeout(()=>{
-
-        outputEl.classList.add('visible');
-
-        setTimeout(loop, 4500);
-
-      }, 700);
-
-    }
-
-  }
-
-  loop();
-
+ const promptEl = document.getElementById('mailPrompt');
+ const outputEl = document.getElementById('mailOutput');
+ if(!promptEl || !outputEl) return;
+ const promptText =
+   "SW 보안 세미나 개강 안내 메일 초안을, 내부 임직원 대상, 존댓말, 8줄 이내로 써줘. " +
+   "일정/장소/대상/문의처는 {일시}, {장소}, {대상}, {문의처} 같은 {토큰} 형태로 남겨줘.";
+ let idx = 0;
+ function startTyping(){
+   idx = 0;
+   promptEl.textContent = "";
+   outputEl.classList.remove('visible');
+   typeChar();
+ }
+ function typeChar(){
+   if(idx <= promptText.length){
+     promptEl.textContent = promptText.slice(0, idx++);
+     // 타이핑 속도 살짝 느리게 (원래 50 → 80)
+     setTimeout(typeChar, 80);
+   }else{
+     // 타이핑 끝나고 메일 초안 천천히 등장
+     setTimeout(()=>{
+       outputEl.classList.add('visible');
+       // 여기서는 더 이상 재시작(loop)하지 않음 → 그대로 유지
+     }, 700);
+   }
+ }
+ startTyping();
 })();
-
 
 
 /* Demo 3 – 출석 데모 (슬라이드 내 축약본) */
